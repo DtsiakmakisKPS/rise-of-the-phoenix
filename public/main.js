@@ -48,12 +48,19 @@ class GameScene extends Phaser.Scene {
         this.otherPlayers.add(otherPlayer);
     }
 
+    startLobby() {
+        this.events.emit('startLobby');
+        console.log('Pre Game Phase!');
+    }
+
     startGame() {
         this.events.emit('startGame');
+        console.log('Game started!');
     }
 
     stopGame() {
         this.events.emit('stopGame');
+        console.log('Game stopped!');
     }
 
     preload(){
@@ -75,7 +82,11 @@ class GameScene extends Phaser.Scene {
         this.socket = io();
         var self = this;
 
+        // React to UI Events
         const HUD = this.scene.get('HUD');
+        HUD.events.on('preGameEnd', function () {
+            this.startGame();
+        }, this);
         HUD.events.on('roundTimerEnd', function () {
             this.stopGame();
         }, this);
@@ -192,7 +203,7 @@ class GameScene extends Phaser.Scene {
             this.chairs.add(chairZone);
         });
 
-        this.startGame();
+        this.startLobby();
     }
 
     handleChairOverlap(player, chairZone) {
@@ -278,8 +289,7 @@ class HUD extends Phaser.Scene {
             { x: sizes.width / 2, y: (sizes.height / 2) - 500 },);
         preGameCounter.addCountdown('preGameEnd', 10);
         preGameCounter.setBackgroundColor('#000', 0.3);
-        Game.events.on('startGame', function () {
-            console.log('Pre Game Phase!');
+        Game.events.on('startLobby', function () {
             preGameCounter.render();
         }, this);
 
@@ -291,15 +301,13 @@ class HUD extends Phaser.Scene {
         );
         roundTimer.addCountdown('roundTimerEnd', 150);
         roundTimer.setBackgroundColor('#001e3c', 0.8);
-        this.events.on('preGameEnd', function () {
-            console.log('Game started!');
+        Game.events.on('startGame', function () {
             roundTimer.render();
         }, this);
 
         const roundOverFeedback = new PlayerFeedback(this, 'Round Over!', sizes);
         roundOverFeedback.setBackgroundColor('#000', 0.3);
         Game.events.on('stopGame', function () {
-            console.log('Game stopped!');
             roundOverFeedback.render();
         }, this);
     }
