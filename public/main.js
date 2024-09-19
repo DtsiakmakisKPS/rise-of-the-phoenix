@@ -1,4 +1,5 @@
 import {musicController} from "./music-controller.js";
+import {RoundTimer} from "./round-timer.js";
 
 const sizes = {
     width: 4160,
@@ -6,10 +7,11 @@ const sizes = {
 }
 
 const speed = 300;
-    var keyA;
-    var keyS;
-    var keyD;
-    var keyW;
+var keyA;
+var keyS;
+var keyD;
+var keyW;
+
 class GameScene extends Phaser.Scene {
     constructor() {
         super('scene-game');
@@ -44,6 +46,14 @@ class GameScene extends Phaser.Scene {
         this.otherPlayers.add(otherPlayer);
     }
 
+    startGame() {
+        this.events.emit('startGame');
+    }
+
+    stopGame() {
+        this.events.emit('stopGame');
+    }
+
     preload(){
         this.load.image('walls', 'assets/Room_Builder_free_32x32.png');
         this.load.image('decoration', 'assets/Interiors_free_32x32.png');
@@ -60,9 +70,13 @@ class GameScene extends Phaser.Scene {
     }
 
     create(){    
-        this.socket = io();  
-        
+        this.socket = io();
         var self = this;
+
+        const HUD = this.scene.get('HUD');
+        HUD.events.on('roundTimerEnd', function () {
+            this.stopGame();
+        }, this);
 
         // Define animations
         this.anims.create({
@@ -231,6 +245,25 @@ class GameScene extends Phaser.Scene {
     }
 }
 
+class HUD extends Phaser.Scene {
+
+    constructor ()
+    {
+        super({ key: 'HUD', active: true });
+    }
+
+    create ()
+    {
+        const roundTimer = new RoundTimer(this);
+        roundTimer.initiateRoundTimer();
+
+        const Game = this.scene.get('scene-game');
+        Game.events.on('startGame', function () {
+            roundTimer.startRoundTimer();
+        }, this);
+    }
+}
+
 const config = {
     type: Phaser.CANVAS,
     width: sizes.width,
@@ -248,7 +281,7 @@ const config = {
         }
 
     },
-    scene: [GameScene]
+    scene: [GameScene, HUD]
 }
 
 const game = new Phaser.Game(config);
