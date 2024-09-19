@@ -139,13 +139,13 @@ class GameScene extends Phaser.Scene {
     }
 
     update(){
-        const { up, down, left , right } = this.cursor;
+        const {up, down, left , right} = this.cursor;
         this.player.setVelocity(0);
         let moving = false;
         let newAnimation = this.currentAnimation;
         // Horizontal movement
         if (left.isDown || keyA.isDown) {
-            this.player.setVelocityX(this.playerSpeed);
+            this.player.setVelocityX(-this.playerSpeed);
             this.player.anims.play('left', true);
             moving = true;
             newAnimation = 'left';
@@ -156,10 +156,9 @@ class GameScene extends Phaser.Scene {
             moving = true;
             newAnimation = 'right';
         }
-
         // Vertical movement
         else if (up.isDown || keyW.isDown) {
-            this.player.setVelocityY(this.playerSpeed);
+            this.player.setVelocityY(-this.playerSpeed);
             this.player.anims.play('up', true);
             moving = true;
             newAnimation = 'up';
