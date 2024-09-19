@@ -2,7 +2,7 @@ import {musicController} from "./music-controller.js";
 
 const sizes = {
     width: 4160,
-    height: 3200
+    height: 3840
 }
 
 const speed = 300;
@@ -61,7 +61,7 @@ class GameScene extends Phaser.Scene {
         this.physics.add.collider(this.player, worldLayer);
         this.physics.add.collider(this.player, decorationLayer);
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
-        this.cameras.main.setZoom(5); // Adjust the zoom level as desired
+        this.cameras.main.setZoom(4); // Adjust the zoom level as desired
         this.cameras.main.setBounds(0, 0, sizes.width, sizes.height); // Set camera bounds to the map size
 
 
