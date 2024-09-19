@@ -1,3 +1,5 @@
+import {musicController} from "./music-controller.js";
+
 const sizes = {
     width: 4160,
     height: 3200
@@ -33,12 +35,14 @@ class GameScene extends Phaser.Scene {
             frameWidth: 32,
             frameHeight: 64,
         });
+        this.load.audio('backgroundMusic', 'assets/game-bg-music.mp3');
     }
 
     create(){
         const map = this.make.tilemap({ key: 'map' });
         const spawnPoint = map.findObject("Spawn Point", obj => obj.name === "Spawn Point");
         const chairObjects = map.getObjectLayer("Chairs")?.objects || []; // Get all chair objects
+        musicController(this.sound);
 
         const tileset = map.addTilesetImage('Room_Builder_free_32x32', 'walls');
         const decorationset = map.addTilesetImage('Interiors_free_32x32', 'decoration');
