@@ -20,9 +20,10 @@ class GameScene extends Phaser.Scene {
         this.playerSpeed = speed + 50;
         this.currentAnimation = 'idle';
         this.chairs = null; // Group to hold chair zones
+        this.entryCollider = null;
     }
 
-    addPlayer(self, playerInfo, spawnPoint, worldLayer, decorationLayer) {
+    addPlayer(self, playerInfo, spawnPoint, worldLayer, decorationLayer, entryLayer) {
         const avatarKey = this.animationState === 'idle' ? 'dude_idle' : 'dude';        
         this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, avatarKey).setOrigin(0.5, 0.5);        
         this.player.setImmovable(false); // Allow player to move
@@ -31,6 +32,7 @@ class GameScene extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.chairs, this.handleChairOverlap, null, this);
         this.physics.add.collider(this.player, worldLayer);        
         this.physics.add.collider(this.player, decorationLayer);
+        this.entryCollider = this.physics.add.collider(this.player, entryLayer);
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
         this.cameras.main.setZoom(5); // Adjust the zoom level as desired
         this.cameras.main.setBounds(0, 0, sizes.width, sizes.height); // Set camera bounds to the map size
@@ -106,14 +108,25 @@ class GameScene extends Phaser.Scene {
         musicController(this.sound);
 
         const tileset = map.addTilesetImage('Room_Builder_free_32x32', 'walls');
-        const decorationset = map.addTilesetImage('Interiors_free_32x32', 'decoration');
+        const decorationset = map.addTilesetImage('Interiors_free_32x32', 'decoration');        
 
         const belowLayer = map.createLayer("floor", tileset, 0, 0);
         const worldLayer = map.createLayer("walls", [tileset, decorationset], 0, 0);
+        const entryLayer = map.createLayer("entry", tileset, 0, 0);
         const decorationLayer = map.createLayer("decorations", decorationset, 0, 0);
 
         worldLayer.setCollisionByProperty({ collides: true });
         decorationLayer.setCollisionByProperty({ collides: true });
+        entryLayer.setCollisionByProperty({ collides: true });
+
+        setTimeout(function() {         
+            console.log(self.entryCollider);   
+            if (self.entryCollider) {
+                console.log("entryLayer", entryLayer);
+                self.physics.world.removeCollider(self.entryCollider);
+                entryLayer.destroy();   
+            }         
+        }, 5000);
                 
         this.cursor = this.input.keyboard.createCursorKeys();
 
@@ -128,7 +141,7 @@ class GameScene extends Phaser.Scene {
         this.socket.on('currentPlayers', function (players) {            
             Object.keys(players).forEach(function (id) {
                 if (players[id].playerId === self.socket.id) {
-                    self.addPlayer(self, players[id], spawnPoint, worldLayer, decorationLayer);
+                    self.addPlayer(self, players[id], spawnPoint, worldLayer, decorationLayer, entryLayer);
                 } else {
                     self.addOtherPlayer(self, players[id]);
                 }
