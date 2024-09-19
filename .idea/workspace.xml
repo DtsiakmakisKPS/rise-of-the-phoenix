@@ -4,7 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="42f45b41-7cbe-409e-a12c-04bc1b530a71" name="Changes" comment="add files again" />
+    <list default="true" id="42f45b41-7cbe-409e-a12c-04bc1b530a71" name="Changes" comment="adjusting size/offset of map and camera zoom">
+      <change afterPath="$PROJECT_DIR$/../.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/assets/Bob_sit_32x32.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/legacy/public/assets/freeAssets/characters/Bob_sit_16x16.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/world.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/world.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/main.js" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -95,7 +104,14 @@
       <option name="project" value="LOCAL" />
       <updated>1726735685526</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="adjusting size/offset of map and camera zoom">
+      <created>1726748554215</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1726748554215</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -104,6 +120,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="remove first directory" />
     <MESSAGE value="add files again" />
-    <option name="LAST_COMMIT_MESSAGE" value="add files again" />
+    <MESSAGE value="adjusting size/offset of map and camera zoom" />
+    <option name="LAST_COMMIT_MESSAGE" value="adjusting size/offset of map and camera zoom" />
   </component>
 </project>
