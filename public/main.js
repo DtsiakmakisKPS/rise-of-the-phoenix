@@ -15,6 +15,7 @@ class GameScene extends Phaser.Scene {
         super('scene-game');
         this.player = null;
         this.otherPlayers = null;
+        this.localSprite = 'bob'
         this.cursor;
         this.animationState = 'idle';
         this.playerSpeed = speed + 50;
@@ -43,17 +44,20 @@ class GameScene extends Phaser.Scene {
     }
 
     preload(){
+        // Load map
         this.load.image('walls', 'assets/Room_Builder_free_32x32.png');
         this.load.image('decoration', 'assets/Interiors_free_32x32.png');
         this.load.tilemapTiledJSON('map', 'assets/world.json');
-        this.load.spritesheet('dude', 'assets/Bob_run_32x32.png', {
+        // Load sprites
+        this.load.spritesheet('dude', 'assets/sprites/bob/Bob_run_32x32.png', {
             frameWidth: 32,
             frameHeight: 64,
         });
-        this.load.spritesheet('dude_idle', 'assets/Bob_idle_anim_32x32.png', {
+        this.load.spritesheet('dude_idle', 'assets/sprites/bob/Bob_idle_anim_32x32.png', {
             frameWidth: 32,
             frameHeight: 64,
         });
+
         this.load.audio('backgroundMusic', 'assets/game-bg-music.mp3');
     }
 

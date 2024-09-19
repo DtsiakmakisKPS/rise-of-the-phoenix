@@ -4,7 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="42f45b41-7cbe-409e-a12c-04bc1b530a71" name="Changes" comment="add files again" />
+    <list default="true" id="42f45b41-7cbe-409e-a12c-04bc1b530a71" name="Changes" comment="add files again">
+      <change afterPath="$PROJECT_DIR$/public/assets/sprites/amelia/Amelia_idle_anim_16x16.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/assets/sprites/amelia/Amelia_run_16x16.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/legacy/public/assets/freeAssets/characters/Adam_idle_anim_16x16.png" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/sprites/adam/Adam_idle_anim_16x16.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/legacy/public/assets/freeAssets/characters/Adam_run_16x16.png" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/sprites/adam/Adam_run_16x16.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/legacy/public/assets/freeAssets/characters/Alex_idle_anim_16x16.png" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/sprites/alex/Alex_idle_anim_16x16.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/legacy/public/assets/freeAssets/characters/Alex_run_16x16.png" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/sprites/alex/Alex_run_16x16.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/Bob_idle_anim_32x32.png" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/sprites/bob/Bob_idle_anim_32x32.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/Bob_run_32x32.png" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/sprites/bob/Bob_run_32x32.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/main.js" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -29,26 +40,32 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/dimitrios.tsiakmakis/Work/Hackathon 2024/phaser-map/public/assets&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/opt/idea-IU-223.8617.56/plugins/javascript-impl/jsLanguageServicesImpl/external&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "/home/dimitrios.tsiakmakis/Work/Hackathon 2024/phaser-map/public/assets/sprites/alex",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "ts.external.directory.path": "/opt/idea-IU-223.8617.56/plugins/javascript-impl/jsLanguageServicesImpl/external",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/public/assets/sprites/alex" />
+      <recent name="$PROJECT_DIR$/public/assets/sprites/amelia" />
       <recent name="$PROJECT_DIR$/public/assets" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/public/assets/sprites/alex" />
+      <recent name="$PROJECT_DIR$/public/assets/sprites/adam" />
+      <recent name="$PROJECT_DIR$/public/assets/sprites/Bob" />
+      <recent name="$PROJECT_DIR$/public/assets/sprites" />
       <recent name="$PROJECT_DIR$/public/assets" />
     </key>
   </component>
@@ -100,6 +117,17 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="remove first directory" />
