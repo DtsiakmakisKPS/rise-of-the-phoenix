@@ -4,16 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="42f45b41-7cbe-409e-a12c-04bc1b530a71" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/../.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/assets/Bob_idle_anim_16x16.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/assets/Bob_run_16x16.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/assets/Room_Builder_free_32x32.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/assets/default.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/assets/dude.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/assets/world.json" afterDir="false" />
+    <list default="true" id="42f45b41-7cbe-409e-a12c-04bc1b530a71" name="Changes" comment="add files again">
+      <change afterPath="$PROJECT_DIR$/public/assets/Bob_idle_anim_32x32.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/assets/Bob_run_32x32.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/assets/Interiors_free_32x32.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/Bob_idle_anim_16x16.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/world.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/world.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/main.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,7 +22,12 @@
     <execution />
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -39,7 +42,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "/home/dimitrios.tsiakmakis/Work/Hackathon 2024/Phaser example",
+    "last_opened_file_path": "/home/dimitrios.tsiakmakis/Work/Hackathon 2024/phaser-map/public/assets",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -57,6 +60,23 @@
       <recent name="$PROJECT_DIR$/public/assets" />
     </key>
   </component>
+  <component name="RunManager">
+    <configuration name="server" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="server" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="npm.server" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -67,10 +87,31 @@
       <updated>1726654133835</updated>
       <workItem from="1726654134938" duration="3814000" />
       <workItem from="1726659667616" duration="3335000" />
+      <workItem from="1726735607854" duration="4231000" />
     </task>
+    <task id="LOCAL-00001" summary="remove first directory">
+      <created>1726735633295</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1726735633295</updated>
+    </task>
+    <task id="LOCAL-00002" summary="add files again">
+      <created>1726735685526</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1726735685526</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="remove first directory" />
+    <MESSAGE value="add files again" />
+    <option name="LAST_COMMIT_MESSAGE" value="add files again" />
   </component>
 </project>
