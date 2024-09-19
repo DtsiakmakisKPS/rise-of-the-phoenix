@@ -1,5 +1,5 @@
 import {musicController} from "./music-controller.js";
-import {RoundTimer} from "./round-timer.js";
+import {PlayerFeedback} from "./player-feedback.js";
 
 const sizes = {
     width: 4160,
@@ -192,7 +192,7 @@ class GameScene extends Phaser.Scene {
             this.chairs.add(chairZone);
         });
 
-        
+        this.startGame();
     }
 
     handleChairOverlap(player, chairZone) {
@@ -204,6 +204,7 @@ class GameScene extends Phaser.Scene {
             this.time.delayedCall(1000, () => {
                 chairZone.hasAlerted = false;
             }, [], this);
+            this.stopGame();
         }
     }
 
@@ -267,12 +268,39 @@ class HUD extends Phaser.Scene {
 
     create ()
     {
-        const roundTimer = new RoundTimer(this);
-        roundTimer.initiateRoundTimer();
-
         const Game = this.scene.get('scene-game');
+
+
+        const preGameCounter = new PlayerFeedback(
+            this,
+            'Game starts in: ',
+            sizes,
+            { x: sizes.width / 2, y: (sizes.height / 2) - 500 },);
+        preGameCounter.addCountdown('preGameEnd', 10);
+        preGameCounter.setBackgroundColor('#000', 0.3);
         Game.events.on('startGame', function () {
-            roundTimer.startRoundTimer();
+            console.log('Pre Game Phase!');
+            preGameCounter.render();
+        }, this);
+
+        const roundTimer = new PlayerFeedback(
+            this,
+            'Round Timer: ',
+            sizes,
+            { x: sizes.width / 2, y: 300 },
+        );
+        roundTimer.addCountdown('roundTimerEnd', 150);
+        roundTimer.setBackgroundColor('#001e3c', 0.8);
+        this.events.on('preGameEnd', function () {
+            console.log('Game started!');
+            roundTimer.render();
+        }, this);
+
+        const roundOverFeedback = new PlayerFeedback(this, 'Round Over!', sizes);
+        roundOverFeedback.setBackgroundColor('#000', 0.3);
+        Game.events.on('stopGame', function () {
+            console.log('Game stopped!');
+            roundOverFeedback.render();
         }, this);
     }
 }

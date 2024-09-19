@@ -11,7 +11,7 @@
   <body>
 
     <div class="volume-control">
-        <button class="volume-button">
+        <button tabindex="-1" class="volume-button">
           <img id="volumeOn" src="/assets/volume.svg" alt="volume" class="volume-icon" />
           <img id="volumeOff" src="/assets/volume-cross.svg" alt="volume" class="volume-icon hidden" />
         </button>
@@ -22,6 +22,7 @@
             step="0.01"
             value="0.2"
             class="volume-slider"
+            tabindex="-1"
         />
     </div>
     <script src="//cdnjs.cloudflare.com/ajax/libs/phaser/3.85.1/phaser.min.js"></script>
@@ -29,6 +30,6 @@
     <canvas id="gameCanvas"></canvas>
     <script type="module" src="/main.js"></script>
     <script type="module" src="/music-controller.js"></script>
-    <script type="module" src="/round-timer.js"></script>
+    <script type="module" src="/player-feedback.js"></script>
   </body>
 </html>

@@ -8,6 +8,11 @@ body {
     accent-color: #1C274C;
 }
 
+.volume-slider:focus {
+    outline: none;
+    box-shadow: none;
+}
+
 .volume-control {
     display: flex;
     align-items: center;
@@ -42,6 +47,11 @@ body {
     align-items: center;
     background-color: transparent;
     border: none;
+}
+
+.volume-button:focus {
+    outline: none;
+    box-shadow: none;
 }
 
 .hidden {
