@@ -4,7 +4,10 @@ const sizes = {
 }
 
 const speed = 300;
-
+    var keyA;
+    var keyS;
+    var keyD;
+    var keyW;
 class GameScene extends Phaser.Scene {
     constructor() {
         super('scene-game');
@@ -15,6 +18,8 @@ class GameScene extends Phaser.Scene {
         this.currentAnimation = 'idle';
         this.chairs = null; // Group to hold chair zones
     }
+
+
 
     preload(){
         this.load.image('walls', 'assets/Room_Builder_free_32x32.png');
@@ -54,6 +59,13 @@ class GameScene extends Phaser.Scene {
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
         this.cameras.main.setZoom(5); // Adjust the zoom level as desired
         this.cameras.main.setBounds(0, 0, sizes.width, sizes.height); // Set camera bounds to the map size
+
+
+        //add WASD Keys for animations
+        keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+        keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+        keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+        keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
 
         // Define animations
         this.anims.create({
@@ -131,28 +143,28 @@ class GameScene extends Phaser.Scene {
         this.player.setVelocity(0);
         let moving = false;
         let newAnimation = this.currentAnimation;
-
         // Horizontal movement
-        if (left.isDown) {
-            this.player.setVelocityX(-300);
+        if (left.isDown || keyA.isDown) {
+            this.player.setVelocityX(-160);
             this.player.anims.play('left', true);
             moving = true;
             newAnimation = 'left';
-        } else if (right.isDown) {
-            this.player.setVelocityX(300);
+        }
+        else if (right.isDown || keyD.isDown) {
+            this.player.setVelocityX(160);
             this.player.anims.play('right', true);
             moving = true;
             newAnimation = 'right';
         }
 
         // Vertical movement
-        if (up.isDown) {
-            this.player.setVelocityY(-300);
+        else if (up.isDown || keyW.isDown) {
+            this.player.setVelocityY(-160);
             this.player.anims.play('up', true);
             moving = true;
             newAnimation = 'up';
-        } else if (down.isDown) {
-            this.player.setVelocityY(300);
+        } else if (down.isDown || keyS.isDown) {
+            this.player.setVelocityY(160);
             this.player.anims.play('down', true);
             moving = true;
             newAnimation = 'down';
