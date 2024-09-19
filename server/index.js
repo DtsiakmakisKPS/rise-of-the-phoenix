@@ -8,13 +8,25 @@ const server = createServer(app);
 const io = new Server(server);
 var players = {};
 const PORT = process.env.PORT || 3000;
+const ipMap = {};
+const BLOCK_IP = true;
 
 app.use(express.static('public'));
-app.get('/', function (req, res) {
-  res.sendFile('public/index.html');
-});
+
 io.on('connection', function (socket) {
     console.log('a user connected');
+
+    const ipAddress =
+    socket.handshake.headers["x-forwarded-for"] ??
+    socket.handshake.headers["x-real-ip"] ??
+    socket.handshake.address;
+
+    if (BLOCK_IP && ipMap[ipAddress]) {
+        socket.disconnect();
+        return;
+    }
+    ipMap[ipAddress] = true;
+
     // create a new player and add it to our players object
     players[socket.id] = {
         x: 0,
