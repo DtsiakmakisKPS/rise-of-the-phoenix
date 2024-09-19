@@ -1,138 +1,59 @@
-import {musicController} from "./music-controller.js";
+// client.js
+import { musicController } from "./music-controller.js";
 
 const sizes = {
     width: 4160,
     height: 3840
-}
+};
+
+// Active sprites available for players
+const activeSpriteKeys = ['adam', 'alex', 'amelia', 'bob'];
 
 const speed = 300;
-    var keyA;
-    var keyS;
-    var keyD;
-    var keyW;
+let keyA, keyS, keyD, keyW;
+
 class GameScene extends Phaser.Scene {
     constructor() {
         super('scene-game');
         this.player = null;
         this.otherPlayers = null;
-        this.localSprite = ''
-        this.cursor;
-        this.animationState = 'idle';
+        this.cursor = null;
         this.playerSpeed = speed + 50;
-        this.currentAnimation = 'idle';
-        this.chairs = null; // Group to hold chair zones
     }
 
-    addPlayer(self, playerInfo, spawnPoint, worldLayer, decorationLayer) {
-        const avatarKey = this.animationState === 'idle' ? `${this.localSprite}_idle` : `${this.localSprite}`;
-        this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, avatarKey).setOrigin(0.5, 0.5);        
-        this.player.setImmovable(false); // Allow player to move
-        this.player.anims.play(this.animationState, true);
-        this.physics.add.collider(this.player, worldLayer);        
-        this.physics.add.collider(this.player, decorationLayer);
-        this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
-        this.cameras.main.setZoom(5); // Adjust the zoom level as desired
-        this.cameras.main.setBounds(0, 0, sizes.width, sizes.height); // Set camera bounds to the map size
-    }
-
-    addOtherPlayer(self, playerInfo) {
-        const avatarKey = this.animationState === 'idle' ? `${this.localSprite}_idle` : `${this.localSprite}`;
-        const otherPlayer = this.physics.add.sprite(playerInfo.x, playerInfo.y,avatarKey).setOrigin(0.5,0.5);          
-        otherPlayer.playerId = playerInfo.playerId;
-        otherPlayer.setImmovable(false);         
-        this.otherPlayers.add(otherPlayer);
-    }
-
-    preload(){
-        // Load map
+    preload() {
+        // Load map assets
         this.load.image('walls', 'assets/Room_Builder_free_32x32.png');
         this.load.image('decoration', 'assets/Interiors_free_32x32.png');
         this.load.tilemapTiledJSON('map', 'assets/world.json');
-        // Load sprites
-        // Adam
-        this.load.spritesheet('adam', 'assets/sprites/adam/Adam_run_32x32.png', {
-            frameWidth: 32,
-            frameHeight: 64,
-        });
-        this.load.spritesheet('adam_idle', 'assets/sprites/adam/Adam_idle_anim_32x32.png', {
-            frameWidth: 32,
-            frameHeight: 64,
-        });
-        // Alex
-        this.load.spritesheet('alex', 'assets/sprites/alex/Alex_run_32x32.png', {
-            frameWidth: 32,
-            frameHeight: 64,
-        });
-        this.load.spritesheet('alex_idle', 'assets/sprites/alex/Alex_idle_anim_32x32.png', {
-            frameWidth: 32,
-            frameHeight: 64,
-        });
-        // Amelia
-        this.load.spritesheet('amelia', 'assets/sprites/amelia/Amelia_run_32x32.png', {
-            frameWidth: 32,
-            frameHeight: 64,
-        });
-        this.load.spritesheet('amelia_idle', 'assets/sprites/amelia/Amelia_idle_anim_32x32.png', {
-            frameWidth: 32,
-            frameHeight: 64,
-        });
-        // Bob
-        this.load.spritesheet('bob', 'assets/sprites/bob/Bob_run_32x32.png', {
-            frameWidth: 32,
-            frameHeight: 64,
-        });
-        this.load.spritesheet('bob_idle', 'assets/sprites/bob/Bob_idle_anim_32x32.png', {
-            frameWidth: 32,
-            frameHeight: 64,
+
+        // Load sprites for each active sprite key
+        activeSpriteKeys.forEach((spriteKey) => {
+            // Load run animation
+            this.load.spritesheet(spriteKey, `assets/sprites/${spriteKey}/${capitalize(spriteKey)}_run_32x32.png`, {
+                frameWidth: 32,
+                frameHeight: 64,
+            });
+
+            // Load idle animation
+            this.load.spritesheet(`${spriteKey}_idle`, `assets/sprites/${spriteKey}/${capitalize(spriteKey)}_idle_anim_32x32.png`, {
+                frameWidth: 32,
+                frameHeight: 64,
+            });
         });
 
+        // Load audio
         this.load.audio('backgroundMusic', 'assets/game-bg-music.mp3');
     }
 
-    create(){    
-        this.socket = io();  
-        
-        var self = this;
+    create() {
+        this.socket = io();
+        const self = this;
 
-        // Define animations
-        this.anims.create({
-            key: 'left',
-            frames: this.anims.generateFrameNumbers('dude', { start: 12, end: 17 }),
-            frameRate: 10,
-            repeat: -1,
-        });
-
-        this.anims.create({
-            key: 'idle',
-            frames: this.anims.generateFrameNumbers('dude_idle', { start: 18, end: 23 }),
-            frameRate: 10,
-        });
-
-        this.anims.create({
-            key: 'right',
-            frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 5 }),
-            frameRate: 10,
-            repeat: -1,
-        });
-
-        // Use frame 4 as a placeholder for up and down movement if no separate animations exist
-        this.anims.create({
-            key: 'up',
-            frames: this.anims.generateFrameNumbers('dude', { start: 6, end: 11 }),
-            frameRate: 10,
-            repeat: -1,
-        });
-
-        this.anims.create({
-            key: 'down',
-            frames: this.anims.generateFrameNumbers('dude', { start: 18, end: 23 }),
-            frameRate: 10,
-            repeat: -1,
-        });
-
+        // Load and configure the tilemap
         const map = this.make.tilemap({ key: 'map' });
         const spawnPoint = map.findObject("Spawn Point", obj => obj.name === "Spawn Point");
-        const chairObjects = map.getObjectLayer("Chairs")?.objects || []; // Get all chair objects
+        const chairObjects = map.getObjectLayer("Chairs")?.objects || [];
         musicController(this.sound);
 
         const tileset = map.addTilesetImage('Room_Builder_free_32x32', 'walls');
@@ -144,41 +65,56 @@ class GameScene extends Phaser.Scene {
 
         worldLayer.setCollisionByProperty({ collides: true });
         decorationLayer.setCollisionByProperty({ collides: true });
-                
-        this.cursor = this.input.keyboard.createCursorKeys();
 
-        //add WASD Keys for animations
+        // Setup input controls
+        this.cursor = this.input.keyboard.createCursorKeys();
         keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
         keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
         keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
-        
+
+        // Initialize groups
         this.otherPlayers = this.physics.add.group();
 
+        // Handle current players
         this.socket.on('currentPlayers', function (players) {
             console.log(players, self.socket.id);
             Object.keys(players).forEach(function (id) {
                 if (players[id].playerId === self.socket.id) {
-                    self.addPlayer(self, players[id], spawnPoint, worldLayer, decorationLayer);
+                    self.addPlayer(players[id], spawnPoint, worldLayer, decorationLayer);
                 } else {
-                    self.addOtherPlayer(self, players[id]);
+                    self.addOtherPlayer(players[id]);
                 }
             });
         });
 
+        // Handle new player joining
         this.socket.on('newPlayer', function (playerInfo) {
-          self.addOtherPlayer(self, playerInfo);
+            self.addOtherPlayer(playerInfo);
         });
 
-        this.socket.on('playerMoved', function (playerInfo) {             
+        // Handle player movement
+        this.socket.on('playerMoved', function (playerInfo) {
             self.otherPlayers.getChildren().forEach(function (otherPlayer) {
-                console.log(playerInfo.playerId, otherPlayer.playerId);
-                if (playerInfo.playerId === otherPlayer.playerId) {                
+                if (playerInfo.playerId === otherPlayer.playerId) {
                     otherPlayer.setPosition(playerInfo.x, playerInfo.y);
+                    // Update animation state if it has changed
+                    if (otherPlayer.animationState !== playerInfo.animationState) {
+                        otherPlayer.anims.play(`${playerInfo.playerSprite}_${playerInfo.animationState}`, true);
+                        otherPlayer.animationState = playerInfo.animationState;
+                    }
                 }
             });
-        });        
+        });
 
+        // Handle player removal
+        this.socket.on('playerRemoved', function (playerId) {
+            self.otherPlayers.getChildren().forEach(function (otherPlayer) {
+                if (playerId === otherPlayer.playerId) {
+                    otherPlayer.destroy();
+                }
+            });
+        });
 
         // Create a physics group for chair zones
         this.chairs = this.physics.add.staticGroup();
@@ -196,8 +132,74 @@ class GameScene extends Phaser.Scene {
             this.chairs.add(chairZone);
         });
 
-        // Add overlap detection between player and chairs
-        //this.physics.add.overlap(this.player, this.chairs, this.handleChairOverlap, null, this);
+        // Define animations for each sprite
+        activeSpriteKeys.forEach((spriteKey) => {
+            // Left
+            this.anims.create({
+                key: `${spriteKey}_left`,
+                frames: this.anims.generateFrameNumbers(spriteKey, { start: 12, end: 17 }),
+                frameRate: 10,
+                repeat: -1,
+            });
+
+            // Idle
+            this.anims.create({
+                key: `${spriteKey}_idle`,
+                frames: this.anims.generateFrameNumbers(`${spriteKey}_idle`, { start: 18, end: 23 }),
+                frameRate: 10,
+                repeat: -1,
+            });
+
+            // Right
+            this.anims.create({
+                key: `${spriteKey}_right`,
+                frames: this.anims.generateFrameNumbers(spriteKey, { start: 0, end: 5 }),
+                frameRate: 10,
+                repeat: -1,
+            });
+
+            // Up
+            this.anims.create({
+                key: `${spriteKey}_up`,
+                frames: this.anims.generateFrameNumbers(spriteKey, { start: 6, end: 11 }),
+                frameRate: 10,
+                repeat: -1,
+            });
+
+            // Down
+            this.anims.create({
+                key: `${spriteKey}_down`,
+                frames: this.anims.generateFrameNumbers(`${spriteKey}`, { start: 18, end: 23 }),
+                frameRate: 10,
+                repeat: -1,
+            });
+        });
+    }
+
+    addPlayer(playerInfo, spawnPoint, worldLayer, decorationLayer) {
+        const avatarKey = `${playerInfo.playerSprite}_idle`;
+        this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, avatarKey).setOrigin(0.5, 0.5);
+        this.player.playerId = playerInfo.playerId;
+        this.player.playerSprite = playerInfo.playerSprite;
+        this.player.animationState = playerInfo.animationState || 'idle';
+        this.player.setImmovable(false); // Allow player to move
+        this.player.anims.play(`${playerInfo.playerSprite}_${this.player.animationState}`, true); // Play initial animation
+        this.physics.add.collider(this.player, worldLayer);
+        this.physics.add.collider(this.player, decorationLayer);
+        this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
+        this.cameras.main.setZoom(5); // Adjust the zoom level as desired
+        this.cameras.main.setBounds(0, 0, sizes.width, sizes.height); // Set camera bounds to the map size
+    }
+
+    addOtherPlayer(playerInfo) {
+        const avatarKey = `${playerInfo.playerSprite}_idle`;
+        const otherPlayer = this.physics.add.sprite(playerInfo.x, playerInfo.y, avatarKey).setOrigin(0.5, 0.5);
+        otherPlayer.playerId = playerInfo.playerId;
+        otherPlayer.playerSprite = playerInfo.playerSprite;
+        otherPlayer.animationState = playerInfo.animationState || 'idle';
+        otherPlayer.setImmovable(false);
+        otherPlayer.anims.play(`${playerInfo.playerSprite}_${otherPlayer.animationState}`, true);
+        this.otherPlayers.add(otherPlayer);
     }
 
     handleChairOverlap(player, chairZone) {
@@ -212,62 +214,75 @@ class GameScene extends Phaser.Scene {
         }
     }
 
-    update(){
-        if(this.player) {
-            const {up, down, left , right} = this.cursor;
+    update() {
+        if (this.player) {
+            const { up, down, left, right } = this.cursor;
             this.player.setVelocity(0);
             let moving = false;
-            let newAnimation = this.currentAnimation;
-            // Horizontal movement
+            let newAnimation = this.player.animationState;
+
+            // Determine movement and set velocity
             if (left.isDown || keyA.isDown) {
                 this.player.setVelocityX(-this.playerSpeed);
-                this.player.anims.play('left', true);
-                moving = true;
                 newAnimation = 'left';
+                moving = true;
             }
             else if (right.isDown || keyD.isDown) {
                 this.player.setVelocityX(this.playerSpeed);
-                this.player.anims.play('right', true);
-                moving = true;
                 newAnimation = 'right';
-            }
-            // Vertical movement
-            else if (up.isDown || keyW.isDown) {
-                this.player.setVelocityY(-this.playerSpeed);
-                this.player.anims.play('up', true);
                 moving = true;
-                newAnimation = 'up';
-            } else if (down.isDown || keyS.isDown) {
-                this.player.setVelocityY(this.playerSpeed);
-                this.player.anims.play('down', true);
-                moving = true;
-                newAnimation = 'down';
             }
 
-            // Idle movement
+            if (up.isDown || keyW.isDown) {
+                this.player.setVelocityY(-this.playerSpeed);
+                newAnimation = 'up';
+                moving = true;
+            } else if (down.isDown || keyS.isDown) {
+                this.player.setVelocityY(this.playerSpeed);
+                newAnimation = 'down';
+                moving = true;
+            }
+
+            // If no movement keys are pressed, set to idle
             if (!moving) {
-                this.player.anims.play('idle', true);
                 newAnimation = 'idle';
             }
-            
-            var x = this.player.x;
-            var y = this.player.y;
-            if (this.player.oldPosition &&  (x !== this.player.oldPosition.x || y !== this.player.oldPosition.y)) {
-                this.socket.emit('playerMovement', { x: this.player.x, y: this.player.y });
-            }    
+
+            // If animation state has changed, play the new animation and emit the change
+            if (newAnimation !== this.player.animationState) {
+                this.player.anims.play(`${this.player.playerSprite}_${newAnimation}`, true);
+                this.player.animationState = newAnimation;
+
+                // Emit the new animation state along with position
+                this.socket.emit('playerMovement', { x: this.player.x, y: this.player.y, animationState: this.player.animationState });
+            }
+
+            // Emit movement if position has changed
+            const x = this.player.x;
+            const y = this.player.y;
+            if (this.player.oldPosition && (x !== this.player.oldPosition.x || y !== this.player.oldPosition.y)) {
+                this.socket.emit('playerMovement', { x: this.player.x, y: this.player.y, animationState: this.player.animationState });
+            }
             this.player.oldPosition = {
                 x: this.player.x,
                 y: this.player.y,
-            }        
+            };
         }
     }
 }
+
+// Helper function to capitalize sprite keys
+function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+const gameCanvas = document.getElementById('gameCanvas'); // Ensure this element exists in your HTML
 
 const config = {
     type: Phaser.CANVAS,
     width: sizes.width,
     height: sizes.height,
-    canvas: gameCanvas,
+    canvas: gameCanvas, // Reference to the existing canvas
     scale: {
         mode: Phaser.Scale.CENTER_BOTH,
         autoCenter: Phaser.Scale.CENTER_BOTH,
@@ -276,11 +291,10 @@ const config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 0 },
-            debug: false
+            debug: false// server.js
         }
-
     },
     scene: [GameScene]
-}
+};
 
 const game = new Phaser.Game(config);
