@@ -1,4 +1,4 @@
-import { musicController } from "./music-controller.js";
+import {musicController} from "./music-controller.js";
 
 const sizes = {
     width: 4160,
@@ -6,11 +6,10 @@ const sizes = {
 }
 
 const speed = 300;
-var keyA;
-var keyS;
-var keyD;
-var keyW;
-
+    var keyA;
+    var keyS;
+    var keyD;
+    var keyW;
 class GameScene extends Phaser.Scene {
     constructor() {
         super('scene-game');
@@ -19,18 +18,15 @@ class GameScene extends Phaser.Scene {
         this.animationState = 'idle';
         this.playerSpeed = speed + 50;
         this.currentAnimation = 'idle';
-        this.chairs = null;
-        this.emptyChair = null;
+        this.chairs = null; // Group to hold chair zones
     }
+
+
 
     preload(){
         this.load.image('walls', 'assets/Room_Builder_free_32x32.png');
         this.load.image('decoration', 'assets/Interiors_free_32x32.png');
         this.load.tilemapTiledJSON('map', 'assets/world.json');
-        this.load.spritesheet('dude_sit', 'assets/Bob_sit_32x32.png', {
-            frameWidth: 48,
-            frameHeight: 64,
-        });
         this.load.spritesheet('dude', 'assets/Bob_run_32x32.png', {
             frameWidth: 32,
             frameHeight: 64,
@@ -55,9 +51,9 @@ class GameScene extends Phaser.Scene {
         const worldLayer = map.createLayer("walls", [tileset, decorationset], 0, 0);
         const decorationLayer = map.createLayer("decorations", decorationset, 0, 0);
 
+
         worldLayer.setCollisionByProperty({ collides: true });
         decorationLayer.setCollisionByProperty({ collides: true });
-
         const avatarKey = this.animationState === 'idle' ? 'dude_idle' : 'dude';
         this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, avatarKey).setOrigin(0.5, 0.5);
         this.player.setImmovable(false); // Allow player to move
@@ -68,7 +64,8 @@ class GameScene extends Phaser.Scene {
         this.cameras.main.setZoom(4); // Adjust the zoom level as desired
         this.cameras.main.setBounds(0, 0, sizes.width, sizes.height); // Set camera bounds to the map size
 
-        // Add WASD Keys for animations
+
+        //add WASD Keys for animations
         keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
         keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
@@ -112,47 +109,21 @@ class GameScene extends Phaser.Scene {
 
         this.player.anims.play(this.animationState, true);
 
-        // Create Chairs
+
+        // Create a physics group for chair zones
         this.chairs = this.physics.add.staticGroup();
 
-        // Ensure there is at least one chair
-        if (chairObjects.length === 0) {
-            console.warn("No chair objects found in the 'Chairs' layer.");
-            return;
-        }
+        // Iterate through each chair object from the tilemap and create a Zone
+        chairObjects.forEach((chair) => {
+            // Create a Zone for each chair
+            const chairZone = this.add.zone(chair.x, chair.y - chair.height, chair.width, chair.height);
+            this.physics.world.enable(chairZone, Phaser.Physics.Arcade.STATIC_BODY);
+            chairZone.body.setSize(chair.width, chair.height);
+            chairZone.body.setOffset(0, 0);
+            chairZone.isChair = true;
 
-        // Randomly select one chair to be the empty chair
-        const randomIndex = Phaser.Math.Between(0, chairObjects.length - 1);
-        const emptyChair = chairObjects[randomIndex];
-        let chairZone;
-        this.emptyChair = emptyChair; // Optional: Store reference if needed
-
-        // Iterate through each chair object from the tilemap and create accordingly
-        chairObjects.forEach((chair, index) => {
-            if (index === randomIndex) {
-                // empty chair does not have a sprite
-                chairZone = this.add.zone(chair.x, chair.y - chair.height, chair.width, chair.height);
-                this.physics.world.enable(chairZone, Phaser.Physics.Arcade.STATIC_BODY);
-                chairZone.body.setSize(chair.width, chair.height);
-                chairZone.body.setOffset(0, 0);
-                chairZone.isEmpty = true; // Mark as empty chair
-
-                // Add the zone to the chairs group
-                this.chairs.add(chairZone);
-            } else {
-                // Regular Chairs
-                const chairSprite = this.physics.add.sprite(chair.x, chair.y, 'dude_sit').setOrigin(0.6, 0.9);
-                chairSprite.body.setImmovable(true); // Prevent chairs from moving if collided
-
-                chairZone = this.add.zone(chair.x, chair.y - chair.height, chair.width, chair.height);
-                this.physics.world.enable(chairZone, Phaser.Physics.Arcade.STATIC_BODY);
-                chairZone.body.setSize(chair.width, chair.height);
-                chairZone.body.setOffset(0, 0);
-                chairZone.isEmpty = false; // Regular chair
-
-                // Add the zone to the chairs group
-                this.chairs.add(chairZone);
-            }
+            // Add the zone to the chairs group
+            this.chairs.add(chairZone);
         });
 
         // Add overlap detection between player and chairs
@@ -160,12 +131,11 @@ class GameScene extends Phaser.Scene {
     }
 
     handleChairOverlap(player, chairZone) {
-        // Trigger alert only if it's the empty chair
-        if (chairZone.isEmpty && !chairZone.hasAlerted) {
-            alert("You touched the empty chair!");
-            chairZone.hasAlerted = true;
+        if (!chairZone.hasAlerted) {
+            alert("You touched a chair!");
+            chairZone.hasAlerted = true; // Set a flag to prevent repeated alerts
 
-            // Reset the flag after some time to allow future alerts
+            // Optionally, reset the flag after some time to allow future alerts
             this.time.delayedCall(1000, () => {
                 chairZone.hasAlerted = false;
             }, [], this);
@@ -173,11 +143,10 @@ class GameScene extends Phaser.Scene {
     }
 
     update(){
-        const { up, down, left, right } = this.cursor;
+        const {up, down, left , right} = this.cursor;
         this.player.setVelocity(0);
         let moving = false;
         let newAnimation = this.currentAnimation;
-
         // Horizontal movement
         if (left.isDown || keyA.isDown) {
             this.player.setVelocityX(-this.playerSpeed);
@@ -191,9 +160,8 @@ class GameScene extends Phaser.Scene {
             moving = true;
             newAnimation = 'right';
         }
-
         // Vertical movement
-        if (up.isDown || keyW.isDown) {
+        else if (up.isDown || keyW.isDown) {
             this.player.setVelocityY(-this.playerSpeed);
             this.player.anims.play('up', true);
             moving = true;
@@ -210,6 +178,7 @@ class GameScene extends Phaser.Scene {
             this.player.anims.play('idle', true);
             newAnimation = 'idle';
         }
+
     }
 }
 
