@@ -137,7 +137,7 @@ class GameScene extends Phaser.Scene {
 }
 
 const config = {
-    type:Phaser.WEBGL,
+    type: Phaser.WEBGL,
     width: sizes.width,
     height: sizes.height,
     canvas: gameCanvas,
