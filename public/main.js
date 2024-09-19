@@ -1,6 +1,3 @@
-import './style.css'
-import Phaser from 'phaser';
-
 const sizes = {
     width: 2700,
     height: 1500
@@ -24,13 +21,13 @@ class GameScene extends Phaser.Scene {
     
 
     preload(){
-        this.load.image('tiles', '/public/assets/Room_Builder_free_32x32.png');
-        this.load.tilemapTiledJSON('map', '/public/assets/world.json');
-        this.load.spritesheet('dude', '/public/assets/Bob_run_16x16.png', {
+        this.load.image('tiles', 'assets/Room_Builder_free_32x32.png');
+        this.load.tilemapTiledJSON('map', 'assets/world.json');
+        this.load.spritesheet('dude', 'assets/Bob_run_16x16.png', {
             frameWidth: 16,
             frameHeight: 32,
         });
-        this.load.spritesheet('dude_idle', '/public/assets/Bob_idle_anim_16x16.png', {
+        this.load.spritesheet('dude_idle', 'assets/Bob_idle_anim_16x16.png', {
             frameWidth: 16,
             frameHeight: 32,
         });

@@ -6,12 +6,17 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "server": "nodemon server/index.js"
   },
   "devDependencies": {
+    "nodemon": "^3.1.5",
     "vite": "^5.4.1"
   },
   "dependencies": {
-    "phaser": "^3.85.2"
+    "express": "^4.21.0",
+    "http": "^0.0.1-security",
+    "phaser": "^3.85.2",
+    "socket.io": "^4.7.5"
   }
 }
