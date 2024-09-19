@@ -15,7 +15,7 @@ class GameScene extends Phaser.Scene {
         super('scene-game');
         this.player = null;
         this.otherPlayers = null;
-        this.localSprite = 'bob'
+        this.localSprite = ''
         this.cursor;
         this.animationState = 'idle';
         this.playerSpeed = speed + 50;
@@ -24,7 +24,7 @@ class GameScene extends Phaser.Scene {
     }
 
     addPlayer(self, playerInfo, spawnPoint, worldLayer, decorationLayer) {
-        const avatarKey = this.animationState === 'idle' ? 'dude_idle' : 'dude';        
+        const avatarKey = this.animationState === 'idle' ? `${this.localSprite}_idle` : `${this.localSprite}`;
         this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, avatarKey).setOrigin(0.5, 0.5);        
         this.player.setImmovable(false); // Allow player to move
         this.player.anims.play(this.animationState, true);
@@ -36,7 +36,7 @@ class GameScene extends Phaser.Scene {
     }
 
     addOtherPlayer(self, playerInfo) {
-        const avatarKey = this.animationState === 'idle' ? 'dude_idle' : 'dude';
+        const avatarKey = this.animationState === 'idle' ? `${this.localSprite}_idle` : `${this.localSprite}`;
         const otherPlayer = this.physics.add.sprite(playerInfo.x, playerInfo.y,avatarKey).setOrigin(0.5,0.5);          
         otherPlayer.playerId = playerInfo.playerId;
         otherPlayer.setImmovable(false);         
@@ -49,11 +49,39 @@ class GameScene extends Phaser.Scene {
         this.load.image('decoration', 'assets/Interiors_free_32x32.png');
         this.load.tilemapTiledJSON('map', 'assets/world.json');
         // Load sprites
-        this.load.spritesheet('dude', 'assets/sprites/bob/Bob_run_32x32.png', {
+        // Adam
+        this.load.spritesheet('adam', 'assets/sprites/adam/Adam_run_32x32.png', {
             frameWidth: 32,
             frameHeight: 64,
         });
-        this.load.spritesheet('dude_idle', 'assets/sprites/bob/Bob_idle_anim_32x32.png', {
+        this.load.spritesheet('adam_idle', 'assets/sprites/adam/Adam_idle_anim_32x32.png', {
+            frameWidth: 32,
+            frameHeight: 64,
+        });
+        // Alex
+        this.load.spritesheet('alex', 'assets/sprites/alex/Alex_run_32x32.png', {
+            frameWidth: 32,
+            frameHeight: 64,
+        });
+        this.load.spritesheet('alex_idle', 'assets/sprites/alex/Alex_idle_anim_32x32.png', {
+            frameWidth: 32,
+            frameHeight: 64,
+        });
+        // Amelia
+        this.load.spritesheet('amelia', 'assets/sprites/amelia/Amelia_run_32x32.png', {
+            frameWidth: 32,
+            frameHeight: 64,
+        });
+        this.load.spritesheet('amelia_idle', 'assets/sprites/amelia/Amelia_idle_anim_32x32.png', {
+            frameWidth: 32,
+            frameHeight: 64,
+        });
+        // Bob
+        this.load.spritesheet('bob', 'assets/sprites/bob/Bob_run_32x32.png', {
+            frameWidth: 32,
+            frameHeight: 64,
+        });
+        this.load.spritesheet('bob_idle', 'assets/sprites/bob/Bob_idle_anim_32x32.png', {
             frameWidth: 32,
             frameHeight: 64,
         });
