@@ -17,8 +17,8 @@ io.on('connection', function (socket) {
     console.log('a user connected');
     // create a new player and add it to our players object
     players[socket.id] = {
-        x: 50,
-        y: 50,
+        x: 0,
+        y: 0,
         playerId: socket.id,
     };
     // send the players object to the new player
@@ -32,14 +32,14 @@ io.on('connection', function (socket) {
         // remove this player from our players object
         delete players[socket.id];
         // emit a message to all players to remove this player
-        socket.disconnect();
+        socket.broadcast.emit('playerRemoved', players[socket.id]);
     });
 
     // when a player moves, update the player data
-    socket.on('playerMovement', function (movementData) {
+    socket.on('playerMovement', function (movementData) {        
         players[socket.id].x = movementData.x;
         players[socket.id].y = movementData.y;        
-        // emit a message to all players about the player that moved
+        // emit a message to all players about the player that moved        
         socket.broadcast.emit('playerMoved', players[socket.id]);
     });
 });

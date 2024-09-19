@@ -24,8 +24,9 @@ class GameScene extends Phaser.Scene {
 
     addPlayer(self, playerInfo, spawnPoint, worldLayer, decorationLayer) {
         const avatarKey = this.animationState === 'idle' ? 'dude_idle' : 'dude';        
-        this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, avatarKey).setOrigin(0.5, 0.5);
+        this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, avatarKey).setOrigin(0.5, 0.5);        
         this.player.setImmovable(false); // Allow player to move
+        this.player.anims.play(this.animationState, true);
         this.physics.add.collider(this.player, worldLayer);        
         this.physics.add.collider(this.player, decorationLayer);
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
@@ -35,7 +36,9 @@ class GameScene extends Phaser.Scene {
 
     addOtherPlayer(self, playerInfo) {
         const avatarKey = this.animationState === 'idle' ? 'dude_idle' : 'dude';
-        const otherPlayer = this.physics.add.sprite(300,300,avatarKey).setOrigin(0.5,0.5);   
+        const otherPlayer = this.physics.add.sprite(playerInfo.x, playerInfo.y,avatarKey).setOrigin(0.5,0.5);          
+        otherPlayer.playerId = playerInfo.playerId;
+        otherPlayer.setImmovable(false);         
         this.otherPlayers.add(otherPlayer);
     }
 
@@ -54,57 +57,11 @@ class GameScene extends Phaser.Scene {
         this.load.audio('backgroundMusic', 'assets/game-bg-music.mp3');
     }
 
-    create(){        
-
-
+    create(){    
         this.socket = io();  
         
         var self = this;
 
-        const map = this.make.tilemap({ key: 'map' });
-        const spawnPoint = map.findObject("Spawn Point", obj => obj.name === "Spawn Point");
-        const chairObjects = map.getObjectLayer("Chairs")?.objects || []; // Get all chair objects
-        musicController(this.sound);
-
-        const tileset = map.addTilesetImage('Room_Builder_free_32x32', 'walls');
-        const decorationset = map.addTilesetImage('Interiors_free_32x32', 'decoration');
-
-        const belowLayer = map.createLayer("floor", tileset, 0, 0);
-        const worldLayer = map.createLayer("walls", [tileset, decorationset], 0, 0);
-        const decorationLayer = map.createLayer("decorations", decorationset, 0, 0);
-
-        worldLayer.setCollisionByProperty({ collides: true });
-        decorationLayer.setCollisionByProperty({ collides: true });
-                
-        this.cursor = this.input.keyboard.createCursorKeys();
-
-        //add WASD Keys for animations
-        keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
-        keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
-        keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
-        keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
-        
-        this.otherPlayers = this.physics.add.group();
-
-        this.socket.on('currentPlayers', function (players) {
-            Object.keys(players).forEach(function (id) {
-                if (players[id].playerId === self.socket.id) {
-                    self.addPlayer(self, players[id], spawnPoint, worldLayer, decorationLayer);
-                } else {
-                    self.addOtherPlayer(self, players[id]);
-                }
-            });
-        });
-
-        
-        this.socket.on('playerMoved', function (playerInfo) {
-            self.otherPlayers.getChildren().forEach(function (otherPlayer) {
-              if (playerInfo.playerId === otherPlayer.playerId) {                
-                otherPlayer.setPosition(playerInfo.x, playerInfo.y);
-              }
-            });
-          });
-/*
         // Define animations
         this.anims.create({
             key: 'left',
@@ -141,8 +98,54 @@ class GameScene extends Phaser.Scene {
             repeat: -1,
         });
 
-        this.player.anims.play(this.animationState, true);
-        */
+        const map = this.make.tilemap({ key: 'map' });
+        const spawnPoint = map.findObject("Spawn Point", obj => obj.name === "Spawn Point");
+        const chairObjects = map.getObjectLayer("Chairs")?.objects || []; // Get all chair objects
+        musicController(this.sound);
+
+        const tileset = map.addTilesetImage('Room_Builder_free_32x32', 'walls');
+        const decorationset = map.addTilesetImage('Interiors_free_32x32', 'decoration');
+
+        const belowLayer = map.createLayer("floor", tileset, 0, 0);
+        const worldLayer = map.createLayer("walls", [tileset, decorationset], 0, 0);
+        const decorationLayer = map.createLayer("decorations", decorationset, 0, 0);
+
+        worldLayer.setCollisionByProperty({ collides: true });
+        decorationLayer.setCollisionByProperty({ collides: true });
+                
+        this.cursor = this.input.keyboard.createCursorKeys();
+
+        //add WASD Keys for animations
+        keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+        keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+        keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+        keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+        
+        this.otherPlayers = this.physics.add.group();
+
+        this.socket.on('currentPlayers', function (players) {
+            console.log(players, self.socket.id);
+            Object.keys(players).forEach(function (id) {
+                if (players[id].playerId === self.socket.id) {
+                    self.addPlayer(self, players[id], spawnPoint, worldLayer, decorationLayer);
+                } else {
+                    self.addOtherPlayer(self, players[id]);
+                }
+            });
+        });
+
+        this.socket.on('newPlayer', function (playerInfo) {
+          self.addOtherPlayer(self, playerInfo);
+        });
+
+        this.socket.on('playerMoved', function (playerInfo) {             
+            self.otherPlayers.getChildren().forEach(function (otherPlayer) {
+                console.log(playerInfo.playerId, otherPlayer.playerId);
+                if (playerInfo.playerId === otherPlayer.playerId) {                
+                    otherPlayer.setPosition(playerInfo.x, playerInfo.y);
+                }
+            });
+        });        
 
 
         // Create a physics group for chair zones
@@ -218,7 +221,7 @@ class GameScene extends Phaser.Scene {
             var x = this.player.x;
             var y = this.player.y;
             if (this.player.oldPosition &&  (x !== this.player.oldPosition.x || y !== this.player.oldPosition.y)) {
-                this.socket.emit('playerMovement', { x: this.cursor.x, y: this.cursor.y });
+                this.socket.emit('playerMovement', { x: this.player.x, y: this.player.y });
             }    
             this.player.oldPosition = {
                 x: this.player.x,
