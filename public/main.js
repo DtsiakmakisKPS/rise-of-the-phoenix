@@ -27,6 +27,8 @@ class GameScene extends Phaser.Scene {
         this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, avatarKey).setOrigin(0.5, 0.5);        
         this.player.setImmovable(false); // Allow player to move
         this.player.anims.play(this.animationState, true);
+        // Add overlap detection between player and chairs
+        this.physics.add.overlap(this.player, this.chairs, this.handleChairOverlap, null, this);
         this.physics.add.collider(this.player, worldLayer);        
         this.physics.add.collider(this.player, decorationLayer);
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
@@ -37,7 +39,7 @@ class GameScene extends Phaser.Scene {
     addOtherPlayer(self, playerInfo) {
         const avatarKey = this.animationState === 'idle' ? 'dude_idle' : 'dude';
         const otherPlayer = this.physics.add.sprite(playerInfo.x, playerInfo.y,avatarKey).setOrigin(0.5,0.5);          
-        otherPlayer.playerId = playerInfo.playerId;
+        otherPlayer.playerId = playerInfo.playerId;        
         otherPlayer.setImmovable(false);         
         this.otherPlayers.add(otherPlayer);
     }
@@ -123,8 +125,7 @@ class GameScene extends Phaser.Scene {
         
         this.otherPlayers = this.physics.add.group();
 
-        this.socket.on('currentPlayers', function (players) {
-            console.log(players, self.socket.id);
+        this.socket.on('currentPlayers', function (players) {            
             Object.keys(players).forEach(function (id) {
                 if (players[id].playerId === self.socket.id) {
                     self.addPlayer(self, players[id], spawnPoint, worldLayer, decorationLayer);
@@ -139,10 +140,10 @@ class GameScene extends Phaser.Scene {
         });
 
         this.socket.on('playerMoved', function (playerInfo) {             
-            self.otherPlayers.getChildren().forEach(function (otherPlayer) {
-                console.log(playerInfo.playerId, otherPlayer.playerId);
+            self.otherPlayers.getChildren().forEach(function (otherPlayer) {                
                 if (playerInfo.playerId === otherPlayer.playerId) {                
                     otherPlayer.setPosition(playerInfo.x, playerInfo.y);
+                    // TODO: play animation
                 }
             });
         });        
@@ -164,8 +165,7 @@ class GameScene extends Phaser.Scene {
             this.chairs.add(chairZone);
         });
 
-        // Add overlap detection between player and chairs
-        //this.physics.add.overlap(this.player, this.chairs, this.handleChairOverlap, null, this);
+        
     }
 
     handleChairOverlap(player, chairZone) {
