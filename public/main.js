@@ -145,13 +145,13 @@ class GameScene extends Phaser.Scene {
         let newAnimation = this.currentAnimation;
         // Horizontal movement
         if (left.isDown || keyA.isDown) {
-            this.player.setVelocityX(-160);
+            this.player.setVelocityX(this.playerSpeed);
             this.player.anims.play('left', true);
             moving = true;
             newAnimation = 'left';
         }
         else if (right.isDown || keyD.isDown) {
-            this.player.setVelocityX(160);
+            this.player.setVelocityX(this.playerSpeed);
             this.player.anims.play('right', true);
             moving = true;
             newAnimation = 'right';
@@ -159,12 +159,12 @@ class GameScene extends Phaser.Scene {
 
         // Vertical movement
         else if (up.isDown || keyW.isDown) {
-            this.player.setVelocityY(-160);
+            this.player.setVelocityY(this.playerSpeed);
             this.player.anims.play('up', true);
             moving = true;
             newAnimation = 'up';
         } else if (down.isDown || keyS.isDown) {
-            this.player.setVelocityY(160);
+            this.player.setVelocityY(this.playerSpeed);
             this.player.anims.play('down', true);
             moving = true;
             newAnimation = 'down';
