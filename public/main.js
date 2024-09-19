@@ -1,6 +1,6 @@
 const sizes = {
-    width: 2700,
-    height: 1500
+    width: 4160,
+    height: 3200
 }
 
 const speed = 300;
@@ -16,37 +16,46 @@ class GameScene extends Phaser.Scene {
         this.animationState = 'idle';
         this.playerSpeed = speed + 50;
         this.currentAnimation = 'idle';
+        this.chairs = null; // Group to hold chair zones
     }
 
-    
+
 
     preload(){
-        this.load.image('tiles', 'assets/Room_Builder_free_32x32.png');
+        this.load.image('walls', 'assets/Room_Builder_free_32x32.png');
+        this.load.image('decoration', 'assets/Interiors_free_32x32.png');
         this.load.tilemapTiledJSON('map', 'assets/world.json');
-        this.load.spritesheet('dude', 'assets/Bob_run_16x16.png', {
-            frameWidth: 16,
-            frameHeight: 32,
+        this.load.spritesheet('dude', 'assets/Bob_run_32x32.png', {
+            frameWidth: 32,
+            frameHeight: 64,
         });
-        this.load.spritesheet('dude_idle', 'assets/Bob_idle_anim_16x16.png', {
-            frameWidth: 16,
-            frameHeight: 32,
+        this.load.spritesheet('dude_idle', 'assets/Bob_idle_anim_32x32.png', {
+            frameWidth: 32,
+            frameHeight: 64,
         });
     }
-    create(){
-        const map = this.make.tilemap( {key: 'map'});
 
-        const tileset = map.addTilesetImage('Room_Builder_free_32x32', 'tiles');
+    create(){
+        const map = this.make.tilemap({ key: 'map' });
+        const spawnPoint = map.findObject("Spawn Point", obj => obj.name === "Spawn Point");
+        const chairObjects = map.getObjectLayer("Chairs")?.objects || []; // Get all chair objects
+
+        const tileset = map.addTilesetImage('Room_Builder_free_32x32', 'walls');
+        const decorationset = map.addTilesetImage('Interiors_free_32x32', 'decoration');
 
         const belowLayer = map.createLayer("floor", tileset, 0, 0);
-        const worldLayer = map.createLayer("walls", tileset, 0, 0);
+        const worldLayer = map.createLayer("walls", [tileset, decorationset], 0, 0);
+        const decorationLayer = map.createLayer("decorations", decorationset, 0, 0);
 
 
         worldLayer.setCollisionByProperty({ collides: true });
+        decorationLayer.setCollisionByProperty({ collides: true });
         const avatarKey = this.animationState === 'idle' ? 'dude_idle' : 'dude';
-        this.player = this.physics.add.sprite(300,300,avatarKey).setOrigin(0.5,0.5);
-        this.player.setImmovable(true);
+        this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, avatarKey).setOrigin(0.5, 0.5);
+        this.player.setImmovable(false); // Allow player to move
         this.cursor = this.input.keyboard.createCursorKeys();
         this.physics.add.collider(this.player, worldLayer);
+        this.physics.add.collider(this.player, decorationLayer);
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
         this.cameras.main.setZoom(5); // Adjust the zoom level as desired
         this.cameras.main.setBounds(0, 0, sizes.width, sizes.height); // Set camera bounds to the map size
@@ -95,7 +104,40 @@ class GameScene extends Phaser.Scene {
         });
 
         this.player.anims.play(this.animationState, true);
+
+
+        // Create a physics group for chair zones
+        this.chairs = this.physics.add.staticGroup();
+
+        // Iterate through each chair object from the tilemap and create a Zone
+        chairObjects.forEach((chair) => {
+            // Create a Zone for each chair
+            const chairZone = this.add.zone(chair.x, chair.y - chair.height, chair.width, chair.height);
+            this.physics.world.enable(chairZone, Phaser.Physics.Arcade.STATIC_BODY);
+            chairZone.body.setSize(chair.width, chair.height);
+            chairZone.body.setOffset(0, 0);
+            chairZone.isChair = true;
+
+            // Add the zone to the chairs group
+            this.chairs.add(chairZone);
+        });
+
+        // Add overlap detection between player and chairs
+        this.physics.add.overlap(this.player, this.chairs, this.handleChairOverlap, null, this);
     }
+
+    handleChairOverlap(player, chairZone) {
+        if (!chairZone.hasAlerted) {
+            alert("You touched a chair!");
+            chairZone.hasAlerted = true; // Set a flag to prevent repeated alerts
+
+            // Optionally, reset the flag after some time to allow future alerts
+            this.time.delayedCall(1000, () => {
+                chairZone.hasAlerted = false;
+            }, [], this);
+        }
+    }
+
     update(){
         const {up, down, left , right} = this.cursor;
         this.player.setVelocity(0);
@@ -103,25 +145,25 @@ class GameScene extends Phaser.Scene {
         let newAnimation = this.currentAnimation;
         // Horizontal movement
         if (left.isDown || keyA.isDown) {
-            this.player.setVelocityX(-160);
+            this.player.setVelocityX(-this.playerSpeed);
             this.player.anims.play('left', true);
             moving = true;
             newAnimation = 'left';
-        } 
+        }
         else if (right.isDown || keyD.isDown) {
-            this.player.setVelocityX(160);
+            this.player.setVelocityX(this.playerSpeed);
             this.player.anims.play('right', true);
             moving = true;
             newAnimation = 'right';
         }
         // Vertical movement
         else if (up.isDown || keyW.isDown) {
-            this.player.setVelocityY(-160);
+            this.player.setVelocityY(-this.playerSpeed);
             this.player.anims.play('up', true);
             moving = true;
             newAnimation = 'up';
         } else if (down.isDown || keyS.isDown) {
-            this.player.setVelocityY(160);
+            this.player.setVelocityY(this.playerSpeed);
             this.player.anims.play('down', true);
             moving = true;
             newAnimation = 'down';
@@ -137,7 +179,7 @@ class GameScene extends Phaser.Scene {
 }
 
 const config = {
-    type: Phaser.WEBGL,
+    type: Phaser.CANVAS,
     width: sizes.width,
     height: sizes.height,
     canvas: gameCanvas,
@@ -148,7 +190,7 @@ const config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: {y:0},
+            gravity: { y: 0 },
             debug: false
         }
 
@@ -157,4 +199,3 @@ const config = {
 }
 
 const game = new Phaser.Game(config);
-
