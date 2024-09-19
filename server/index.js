@@ -1,3 +1,4 @@
+
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
@@ -11,16 +12,27 @@ const activeSpriteKeys = ['adam', 'alex', 'amelia', 'bob'];
 
 let players = {};
 const PORT = process.env.PORT || 3000;
+const ipMap = {};
+const BLOCK_IP = true;
 
 // Serve static files from the 'public' directory
 app.use(express.static('public'));
 
-// Serve the index.html on the root path
-app.get('/', function (req, res) {
-    res.sendFile('public/index.html');
-});
-
 io.on('connection', function (socket) {
+    console.log('a user connected');
+
+    const ipAddress =
+    socket.handshake.headers["x-forwarded-for"] ??
+    socket.handshake.headers["x-real-ip"] ??
+    socket.handshake.address;
+
+    if (BLOCK_IP && ipMap[ipAddress]) {
+        socket.disconnect();
+        return;
+    }
+    ipMap[ipAddress] = true;
+
+    // create a new player and add it to our players object
     console.log(`User connected: ${socket.id}`);
 
     // Assign a random sprite key to the new player
@@ -29,7 +41,7 @@ io.on('connection', function (socket) {
 
     // Initialize the new player with default position and animation state
     players[socket.id] = {
-        x: 0, // You can set a default spawn position or randomize it
+        x: 0,
         y: 0,
         playerId: socket.id,
         playerSprite: assignedSprite,
@@ -46,11 +58,14 @@ io.on('connection', function (socket) {
     socket.on('disconnect', function () {
         console.log(`User disconnected: ${socket.id}`);
 
-        // Remove the player from the players object
+
+        // remove this player from our players object
         delete players[socket.id];
 
         // Notify all players to remove this player
         socket.broadcast.emit('playerRemoved', socket.id);
+        delete ipMap[ipAddress];
+
     });
 
     // Handle player movement and animation updates
@@ -69,7 +84,6 @@ io.on('connection', function (socket) {
 server.listen(PORT, function () {
     console.log(`Listening on ${server.address().port}`);
 });
-
 
 /*
 // Serve static files from the public directory
