@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="42f45b41-7cbe-409e-a12c-04bc1b530a71" name="Changes" comment="add files again" />
+    <list default="true" id="42f45b41-7cbe-409e-a12c-04bc1b530a71" name="Changes" comment="add files again">
+      <change afterPath="$PROJECT_DIR$/public/assets/Bob_sit_32x32.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/world.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/world.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/main.js" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -100,6 +104,17 @@
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="remove first directory" />

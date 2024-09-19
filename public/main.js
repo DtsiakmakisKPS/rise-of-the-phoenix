@@ -51,6 +51,10 @@ class GameScene extends Phaser.Scene {
             frameWidth: 32,
             frameHeight: 64,
         });
+        this.load.spritesheet('dude_sit', 'assets/Bob_sit_32x32.png', {
+            frameWidth: 48,
+            frameHeight: 64,
+        });
         this.load.audio('backgroundMusic', 'assets/game-bg-music.mp3');
     }
 
@@ -152,6 +156,7 @@ class GameScene extends Phaser.Scene {
         chairObjects.forEach((chair) => {
             // Create a Zone for each chair
             const chairZone = this.add.zone(chair.x, chair.y - chair.height, chair.width, chair.height);
+            this.physics.add.sprite(chair.x, chair.y, 'dude_sit').setOrigin(0.6, 0.9);
             this.physics.world.enable(chairZone, Phaser.Physics.Arcade.STATIC_BODY);
             chairZone.body.setSize(chair.width, chair.height);
             chairZone.body.setOffset(0, 0);
