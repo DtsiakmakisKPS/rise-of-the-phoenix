@@ -41,8 +41,9 @@ io.on('connection', function (socket) {
     socket.on('disconnect', function () {
         console.log('user disconnected');   
         
-        // remove this player from our players object
+        // remove this player from our players object        
         delete players[socket.id];
+        delete ipMap[ipAddress];
         // emit a message to all players to remove this player
         socket.broadcast.emit('playerRemoved', players[socket.id]);
     });
