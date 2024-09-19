@@ -1,0 +1,32 @@
+<!-- public/index.html -->
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Seat Race Game</title>
+        <link rel="stylesheet" href="style.css" />
+<!--        &lt;!&ndash; Include Phaser.js via CDN &ndash;&gt;-->
+<!--        <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js"></script>-->
+    </head>
+    <body>
+        <!-- Login Screen -->
+        <div id="loginScreen" class="screen">
+            <h1>Seat Race Game</h1>
+            <input type="text" id="username" placeholder="Enter your username" />
+            <button id="joinBtn">Join Game</button>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="screen hidden">
+            <div id="status"></div>
+        </div>
+
+        <!-- Include Socket.io -->
+        <script src="/socket.io/socket.io.js"></script>
+        <!-- Include Phaser Game -->
+        <script src="client.js"></script>
+    </body>
+</html>
