@@ -14,6 +14,7 @@ class GameScene extends Phaser.Scene {
     constructor() {
         super('scene-game');
         this.player = null;
+        this.otherPlayers = null;
         this.cursor;
         this.animationState = 'idle';
         this.playerSpeed = speed + 50;
@@ -21,7 +22,22 @@ class GameScene extends Phaser.Scene {
         this.chairs = null; // Group to hold chair zones
     }
 
+    addPlayer(self, playerInfo, spawnPoint, worldLayer, decorationLayer) {
+        const avatarKey = this.animationState === 'idle' ? 'dude_idle' : 'dude';        
+        this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, avatarKey).setOrigin(0.5, 0.5);
+        this.player.setImmovable(false); // Allow player to move
+        this.physics.add.collider(this.player, worldLayer);        
+        this.physics.add.collider(this.player, decorationLayer);
+        this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
+        this.cameras.main.setZoom(5); // Adjust the zoom level as desired
+        this.cameras.main.setBounds(0, 0, sizes.width, sizes.height); // Set camera bounds to the map size
+    }
 
+    addOtherPlayer(self, playerInfo) {
+        const avatarKey = this.animationState === 'idle' ? 'dude_idle' : 'dude';
+        const otherPlayer = this.physics.add.sprite(300,300,avatarKey).setOrigin(0.5,0.5);   
+        this.otherPlayers.add(otherPlayer);
+    }
 
     preload(){
         this.load.image('walls', 'assets/Room_Builder_free_32x32.png');
@@ -38,7 +54,13 @@ class GameScene extends Phaser.Scene {
         this.load.audio('backgroundMusic', 'assets/game-bg-music.mp3');
     }
 
-    create(){
+    create(){        
+
+
+        this.socket = io();  
+        
+        var self = this;
+
         const map = this.make.tilemap({ key: 'map' });
         const spawnPoint = map.findObject("Spawn Point", obj => obj.name === "Spawn Point");
         const chairObjects = map.getObjectLayer("Chairs")?.objects || []; // Get all chair objects
@@ -51,26 +73,38 @@ class GameScene extends Phaser.Scene {
         const worldLayer = map.createLayer("walls", [tileset, decorationset], 0, 0);
         const decorationLayer = map.createLayer("decorations", decorationset, 0, 0);
 
-
         worldLayer.setCollisionByProperty({ collides: true });
         decorationLayer.setCollisionByProperty({ collides: true });
-        const avatarKey = this.animationState === 'idle' ? 'dude_idle' : 'dude';
-        this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, avatarKey).setOrigin(0.5, 0.5);
-        this.player.setImmovable(false); // Allow player to move
+                
         this.cursor = this.input.keyboard.createCursorKeys();
-        this.physics.add.collider(this.player, worldLayer);
-        this.physics.add.collider(this.player, decorationLayer);
-        this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
-        this.cameras.main.setZoom(4); // Adjust the zoom level as desired
-        this.cameras.main.setBounds(0, 0, sizes.width, sizes.height); // Set camera bounds to the map size
-
 
         //add WASD Keys for animations
         keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
         keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
         keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+        
+        this.otherPlayers = this.physics.add.group();
 
+        this.socket.on('currentPlayers', function (players) {
+            Object.keys(players).forEach(function (id) {
+                if (players[id].playerId === self.socket.id) {
+                    self.addPlayer(self, players[id], spawnPoint, worldLayer, decorationLayer);
+                } else {
+                    self.addOtherPlayer(self, players[id]);
+                }
+            });
+        });
+
+        
+        this.socket.on('playerMoved', function (playerInfo) {
+            self.otherPlayers.getChildren().forEach(function (otherPlayer) {
+              if (playerInfo.playerId === otherPlayer.playerId) {                
+                otherPlayer.setPosition(playerInfo.x, playerInfo.y);
+              }
+            });
+          });
+/*
         // Define animations
         this.anims.create({
             key: 'left',
@@ -108,6 +142,7 @@ class GameScene extends Phaser.Scene {
         });
 
         this.player.anims.play(this.animationState, true);
+        */
 
 
         // Create a physics group for chair zones
@@ -127,7 +162,7 @@ class GameScene extends Phaser.Scene {
         });
 
         // Add overlap detection between player and chairs
-        this.physics.add.overlap(this.player, this.chairs, this.handleChairOverlap, null, this);
+        //this.physics.add.overlap(this.player, this.chairs, this.handleChairOverlap, null, this);
     }
 
     handleChairOverlap(player, chairZone) {
@@ -143,42 +178,53 @@ class GameScene extends Phaser.Scene {
     }
 
     update(){
-        const {up, down, left , right} = this.cursor;
-        this.player.setVelocity(0);
-        let moving = false;
-        let newAnimation = this.currentAnimation;
-        // Horizontal movement
-        if (left.isDown || keyA.isDown) {
-            this.player.setVelocityX(-this.playerSpeed);
-            this.player.anims.play('left', true);
-            moving = true;
-            newAnimation = 'left';
-        }
-        else if (right.isDown || keyD.isDown) {
-            this.player.setVelocityX(this.playerSpeed);
-            this.player.anims.play('right', true);
-            moving = true;
-            newAnimation = 'right';
-        }
-        // Vertical movement
-        else if (up.isDown || keyW.isDown) {
-            this.player.setVelocityY(-this.playerSpeed);
-            this.player.anims.play('up', true);
-            moving = true;
-            newAnimation = 'up';
-        } else if (down.isDown || keyS.isDown) {
-            this.player.setVelocityY(this.playerSpeed);
-            this.player.anims.play('down', true);
-            moving = true;
-            newAnimation = 'down';
-        }
+        if(this.player) {
+            const {up, down, left , right} = this.cursor;
+            this.player.setVelocity(0);
+            let moving = false;
+            let newAnimation = this.currentAnimation;
+            // Horizontal movement
+            if (left.isDown || keyA.isDown) {
+                this.player.setVelocityX(-this.playerSpeed);
+                this.player.anims.play('left', true);
+                moving = true;
+                newAnimation = 'left';
+            }
+            else if (right.isDown || keyD.isDown) {
+                this.player.setVelocityX(this.playerSpeed);
+                this.player.anims.play('right', true);
+                moving = true;
+                newAnimation = 'right';
+            }
+            // Vertical movement
+            else if (up.isDown || keyW.isDown) {
+                this.player.setVelocityY(-this.playerSpeed);
+                this.player.anims.play('up', true);
+                moving = true;
+                newAnimation = 'up';
+            } else if (down.isDown || keyS.isDown) {
+                this.player.setVelocityY(this.playerSpeed);
+                this.player.anims.play('down', true);
+                moving = true;
+                newAnimation = 'down';
+            }
 
-        // Idle movement
-        if (!moving) {
-            this.player.anims.play('idle', true);
-            newAnimation = 'idle';
+            // Idle movement
+            if (!moving) {
+                this.player.anims.play('idle', true);
+                newAnimation = 'idle';
+            }
+            
+            var x = this.player.x;
+            var y = this.player.y;
+            if (this.player.oldPosition &&  (x !== this.player.oldPosition.x || y !== this.player.oldPosition.y)) {
+                this.socket.emit('playerMovement', { x: this.cursor.x, y: this.cursor.y });
+            }    
+            this.player.oldPosition = {
+                x: this.player.x,
+                y: this.player.y,
+            }        
         }
-
     }
 }
 
