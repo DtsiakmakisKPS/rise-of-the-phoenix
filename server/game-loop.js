@@ -4,7 +4,7 @@ export default class GameLoop {
 
         // Phase durations in milliseconds
         this.PRE_GAME_DURATION = 10 * 1000;      // 10 seconds
-        this.GAME_DURATION = 150 * 1000;         // 150 seconds (2.5 minutes)
+        this.GAME_DURATION = 60 * 1000;         // 150 seconds (2.5 minutes)
         this.GAME_BREAK_DURATION = 2 * 1000;     // 2 seconds
 
         this.currentPhase = 'PRE_GAME'; // Possible phases: 'PRE_GAME', 'GAME', 'GAME_BREAK'

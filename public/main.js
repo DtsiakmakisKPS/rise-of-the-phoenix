@@ -195,6 +195,12 @@ class GameScene extends Phaser.Scene {
             });
         });
 
+        this.socket.on('chairFound', () => {
+            console.log('END GAME');
+            //There is still logic needed, to respawn people
+        });
+
+
         // Handle player removal
         this.socket.on('playerRemoved', (playerId) => {
             this.otherPlayers.getChildren().forEach((otherPlayer) => {
@@ -234,7 +240,7 @@ class GameScene extends Phaser.Scene {
             // Create a Zone for each chair
             const chairZone = this.add.zone(chair.x, chair.y - chair.height, chair.width, chair.height);
             this.physics.world.enable(chairZone, Phaser.Physics.Arcade.STATIC_BODY);
-            chairZone.body.setSize(chair.width, chair.height);
+            chairZone.body.setSize(chair.width + 100, chair.height);
             chairZone.body.setOffset(0, 0);
             chairZone.isChair = true;
             chairZone.taken = chair.taken;
@@ -304,9 +310,13 @@ class GameScene extends Phaser.Scene {
     handleChairOverlap(player, chairZone) {
         const finalPopup = document.querySelector('.final-popup')
         if (!chairZone.taken) {
-            finalPopup.classList.remove('hidden')
+            // finalPopup.classList.remove('hidden');
             player.body.setVelocity(0);
             this.physics.pause();
+            //Event Emitter chair found
+            this.socket.emit('chairFound', this.socket.id);
+           
+
         }
     }
 
@@ -402,10 +412,6 @@ class HUD extends Phaser.Scene {
             'center'
         );
         preGameCounter.setBackgroundColor('#000', 0.3);
-        Game.events.on('startLobby', function (remainingTime) {
-            preGameCounter.addCountdown('preGameEnd', remainingTime || 10);
-            preGameCounter.render();
-        }, this);
 
         const roundTimer = new PlayerFeedback(
             this,
@@ -413,17 +419,30 @@ class HUD extends Phaser.Scene {
             null,
             'top-right'
         );
-
         roundTimer.setBackgroundColor('#001e3c', 0.8);
-        Game.events.on('startGame', function (remainingTime) {
-            roundTimer.addCountdown('roundTimerEnd', remainingTime || 150);
-            roundTimer.render();
-        }, this);
 
         const roundOverFeedback = new PlayerFeedback(this, 'Round Over!', null, 'center');
         roundOverFeedback.setBackgroundColor('#000', 0.3);
+
+
+        Game.events.on('startLobby', function (remainingTime) {
+            console.log('startLobby', remainingTime);
+            roundOverFeedback.removeFeedback();
+            preGameCounter.addCountdown('preGameEnd', remainingTime ?? 10);
+            preGameCounter.render();
+        }, this);
+
+        Game.events.on('startGame', function (remainingTime) {
+            console.log('startGame', remainingTime);
+            preGameCounter.removeFeedback();
+            roundTimer.addCountdown('roundTimerEnd', remainingTime ?? 60);
+            roundTimer.render();
+        }, this);
+
         Game.events.on('stopGame', function (remainingTime) {
-            roundOverFeedback.setDuration(remainingTime || 2)
+            console.log('stopGame', remainingTime);
+            roundTimer.removeFeedback();
+            roundOverFeedback.setDuration(remainingTime ?? 2)
             roundOverFeedback.render();
         }, this);
     }
