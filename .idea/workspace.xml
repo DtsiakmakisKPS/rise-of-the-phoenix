@@ -4,29 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="42f45b41-7cbe-409e-a12c-04bc1b530a71" name="Changes" comment="merge with master">
-      <change afterPath="$PROJECT_DIR$/.prettierignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.prettierrc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/assets/sprites/bob/Bob_sit_32x32.png" afterDir="false" />
+    <list default="true" id="42f45b41-7cbe-409e-a12c-04bc1b530a71" name="Changes" comment="refactoring, random chair generation logic, add prettier and merging with master">
+      <change afterPath="$PROJECT_DIR$/public/assets/map/Interiors_32x32.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/assets/map/Room_Builder_32x32.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/assets/Bob_run_16x16.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/assets/Interiors_free_32x32.png" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/map/Interiors_free_32x32.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/assets/Room_Builder_free_32x32.png" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/map/Room_Builder_free_32x32.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/assets/default.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/assets/dude.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/assets/game-bg-music.mp3" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/audio/game-bg-music.mp3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/assets/map.tmx" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/map/map.tmx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/assets/volume-cross.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/audio/volume-cross.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/assets/volume.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/audio/volume.svg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/assets/world.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/map/world.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/public/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/main.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/music-controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/music-controller.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/round-timer.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/round-timer.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/public/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/index.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -57,7 +39,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "/home/dimitrios.tsiakmakis/Work/Hackathon 2024/phaser-map/public/assets/sprites/bob",
+    "last_opened_file_path": "/home/dimitrios.tsiakmakis/Work/Hackathon 2024/phaser-map/public/assets/map",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -70,11 +52,11 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/public/assets/map" />
       <recent name="$PROJECT_DIR$/public/assets/sprites/bob" />
       <recent name="$PROJECT_DIR$/public/assets/sprites/amelia" />
       <recent name="$PROJECT_DIR$/public/assets/sprites/adam" />
       <recent name="$PROJECT_DIR$/public/assets/sprites/alex" />
-      <recent name="$PROJECT_DIR$/public/assets" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/public/assets/audio" />
@@ -157,7 +139,14 @@
       <option name="project" value="LOCAL" />
       <updated>1726754674144</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="refactoring, random chair generation logic, add prettier and merging with master">
+      <created>1726813351760</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1726813351760</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -178,6 +167,7 @@
     <MESSAGE value="remove first directory" />
     <MESSAGE value="add files again" />
     <MESSAGE value="chairs with npc's" />
-    <option name="LAST_COMMIT_MESSAGE" value="chairs with npc's" />
+    <MESSAGE value="refactoring, random chair generation logic, add prettier and merging with master" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactoring, random chair generation logic, add prettier and merging with master" />
   </component>
 </project>

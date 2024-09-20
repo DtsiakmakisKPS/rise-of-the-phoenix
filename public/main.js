@@ -37,6 +37,8 @@ class GameScene extends Phaser.Scene {
         // Load map assets
         this.load.image('walls', 'assets/map/Room_Builder_free_32x32.png');
         this.load.image('decoration', 'assets/map/Interiors_free_32x32.png');
+        // this.load.image('walls_extended', 'assets/map/Room_Builder_32x32.png');
+        // this.load.image('decoration_extended', 'assets/map/Interiors_32x32.png');
         this.load.tilemapTiledJSON('map', 'assets/map/world.json');
 
         // Load sprites for each active sprite key
@@ -93,6 +95,8 @@ class GameScene extends Phaser.Scene {
 
         const tileset = map.addTilesetImage('Room_Builder_free_32x32', 'walls');
         const decorationset = map.addTilesetImage('Interiors_free_32x32', 'decoration');
+        // const tilesetExtended = map.addTilesetImage('Room_Builder_32x32', 'walls_extended');
+        // const decorationsetExtended = map.addTilesetImage('Interiors_32x32', 'decoration_extended');
 
         const belowLayer = map.createLayer('floor', tileset, 0, 0);
         const worldLayer = map.createLayer('walls', [tileset, decorationset], 0, 0);
