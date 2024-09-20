@@ -11,7 +11,7 @@ var keyA;
 var keyS;
 var keyD;
 var keyW;
-
+const ZOOM_LEVEL = 0.5;
 class GameScene extends Phaser.Scene {
     constructor() {
         super('scene-game');
@@ -139,11 +139,14 @@ class GameScene extends Phaser.Scene {
         const worldLayer = map.createLayer("walls", [tileset, decorationset], 0, 0);
         const entryLayer = map.createLayer("entry", tileset, 0, 0);
         const decorationLayer = map.createLayer("decorations", decorationset, 0, 0);
-
+    
         worldLayer.setCollisionByProperty({ collides: true });
         decorationLayer.setCollisionByProperty({ collides: true });
         entryLayer.setCollisionByProperty({ collides: true });
-
+        game.scale.resize(window.innerWidth/ZOOM_LEVEL, window.innerHeight/ZOOM_LEVEL);
+       
+        this.resizing(this.cameras);
+       
         setTimeout(function() {         
             console.log(self.entryCollider);   
             if (self.entryCollider) {
@@ -220,6 +223,8 @@ class GameScene extends Phaser.Scene {
     }
 
     update(){
+    
+        // this.cameras.main.setZoom(5)
         if(this.player) {
             const {up, down, left , right} = this.cursor;
             this.player.setVelocity(0);
@@ -267,6 +272,14 @@ class GameScene extends Phaser.Scene {
                 y: this.player.y,
             }        
         }
+    }
+    resizing(cameras) {
+        window.addEventListener("resize", () => {
+            game.scale.resize(window.innerWidth/ZOOM_LEVEL, window.innerHeight/ZOOM_LEVEL);
+            cameras.main.setZoom(3); // Adjust the zoom level as desired
+        },false
+
+        );
     }
 }
 
@@ -319,10 +332,11 @@ const config = {
     height: 600,
     canvas: gameCanvas,    
     scale: {
-        parent: 'game-wrapper',
-        mode: Phaser.Scale.FIT,
-        width: 1700,
-        height: 600,
+        mode: Phaser.Scale.NONE,
+        width: window.innerWidth/ZOOM_LEVEL,
+        height: window.innerHeight/ZOOM_LEVEL,
+        zoom: ZOOM_LEVEL
+        
     },
     physics: {
         default: 'arcade',
