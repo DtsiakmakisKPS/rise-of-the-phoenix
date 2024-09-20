@@ -1,6 +1,7 @@
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import GameLoop from "./game-loop.js";
 
 const app = express();
 const server = createServer(app);
@@ -13,6 +14,8 @@ let players = {};
 const PORT = process.env.PORT || 3000;
 const ipMap = {};
 const BLOCK_IP = true;
+
+const gameLoop = new GameLoop(io);
 
 // Serve static files from the 'public' directory
 app.use(express.static('public'));
@@ -53,6 +56,7 @@ io.on('connection', function (socket) {
     // Notify all other players about the new player
     socket.broadcast.emit('newPlayer', players[socket.id]);
 
+    socket.emit('phaseChange', { phase: gameLoop.getCurrentPhase() });
     // Handle player disconnection
     socket.on('disconnect', function () {
         console.log(`User disconnected: ${socket.id}`);

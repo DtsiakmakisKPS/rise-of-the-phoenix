@@ -18,7 +18,7 @@ export class PlayerFeedback {
         this.backgroundNode = null;
 
         // Styles
-        this.textStyle = { font: '200px Arial', fill: '#fff' };
+        this.textStyle = { font: '25px Arial', fill: '#fff' };
         this.backgroundColor = { color: '#000', alpha: 1 };
 
         // Timer properties

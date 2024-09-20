@@ -1,5 +1,6 @@
-import { musicController } from "./music-controller.js";
-import { PlayerFeedback } from "./player-feedback.js";
+import {musicController} from "./music-controller.js";
+import {PlayerFeedback} from "./player-feedback.js";
+import {gamesStateListeners} from "./games-state-listener.js";
 
 const worldSize = {
     width: 4160,
@@ -60,18 +61,19 @@ class GameScene extends Phaser.Scene {
         this.otherPlayers.add(otherPlayer);
     }
 
-    startLobby() {
-        this.events.emit('startLobby');
+    // Game Lifecycle Hooks
+    startLobby(remainingTime) {
+        this.events.emit('startLobby', remainingTime);
         console.log('Pre Game Phase!');
     }
 
-    startGame() {
-        this.events.emit('startGame');
+    startGame(remainingTime) {
+        this.events.emit('startGame', remainingTime);
         console.log('Game started!');
     }
 
-    stopGame() {
-        this.events.emit('stopGame');
+    stopGame(remainingTime) {
+        this.events.emit('stopGame', remainingTime);
         console.log('Game stopped!');
     }
 
@@ -120,14 +122,7 @@ class GameScene extends Phaser.Scene {
         this.socket = io();
         const self = this;
 
-        // React to UI Events
-        const HUD = this.scene.get('HUD');
-        HUD.events.on('preGameEnd', () => {
-            this.startGame();
-        }, this);
-        HUD.events.on('roundTimerEnd', () => {
-            this.stopGame();
-        }, this);
+        gamesStateListeners(this);
 
         // Load and configure the tilemap
         const map = this.make.tilemap({ key: 'map' });
@@ -281,8 +276,6 @@ class GameScene extends Phaser.Scene {
                 repeat: -1,
             });
         });
-
-        this.startLobby(); // Move outside the forEach loop
     }
 
     handleChairOverlap(player, chairZone) {
@@ -295,7 +288,6 @@ class GameScene extends Phaser.Scene {
             this.time.delayedCall(1000, () => {
                 chairZone.hasAlerted = false;
             }, [], this);
-            this.stopGame();
         }
     }
 
@@ -391,11 +383,11 @@ class HUD extends Phaser.Scene {
             this,
             'Game starts in: ',
             worldSize,
-            { x: worldSize.width / 2, y: (worldSize.height / 2) - 500 },
+            { x: 310, y: 100 },
         );
-        preGameCounter.addCountdown('preGameEnd', 10);
         preGameCounter.setBackgroundColor('#000', 0.3);
-        Game.events.on('startLobby', () => {
+        Game.events.on('startLobby', function (remainingTime) {
+            preGameCounter.addCountdown('preGameEnd', remainingTime || 10);
             preGameCounter.render();
         }, this);
 
@@ -403,17 +395,19 @@ class HUD extends Phaser.Scene {
             this,
             'Round Timer: ',
             worldSize,
-            { x: worldSize.width / 2, y: 300 },
+            { x: 310, y: 100 },
         );
-        roundTimer.addCountdown('roundTimerEnd', 150);
+
         roundTimer.setBackgroundColor('#001e3c', 0.8);
-        Game.events.on('startGame', () => {
+        Game.events.on('startGame', function (remainingTime) {
+            roundTimer.addCountdown('roundTimerEnd', remainingTime || 150);
             roundTimer.render();
         }, this);
 
         const roundOverFeedback = new PlayerFeedback(this, 'Round Over!', worldSize);
         roundOverFeedback.setBackgroundColor('#000', 0.3);
-        Game.events.on('stopGame', () => {
+        Game.events.on('stopGame', function (remainingTime) {
+            roundOverFeedback.setDuration(remainingTime || 2)
             roundOverFeedback.render();
         }, this);
     }
