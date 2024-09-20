@@ -451,22 +451,34 @@ class HUD extends Phaser.Scene {
 
         Game.events.on('startLobby', function (remainingTime) {
             console.log('startLobby', remainingTime);
+            let timer = remainingTime;
+            if(remainingTime === 'NaN' || !remainingTime) {
+                timer = 10;
+            }
             roundOverFeedback.removeFeedback();
-            preGameCounter.addCountdown('preGameEnd', remainingTime ?? 10);
+            preGameCounter.addCountdown('preGameEnd', timer);
             preGameCounter.render();
         }, this);
 
         Game.events.on('startGame', function (remainingTime) {
             console.log('startGame', remainingTime);
+            let timer = remainingTime;
+            if(remainingTime === 'NaN' || !remainingTime) {
+                timer = 60;
+            }
             preGameCounter.removeFeedback();
-            roundTimer.addCountdown('roundTimerEnd', remainingTime ?? 60);
+            roundTimer.addCountdown('roundTimerEnd', timer);
             roundTimer.render();
         }, this);
 
         Game.events.on('stopGame', function (remainingTime) {
             console.log('stopGame', remainingTime);
+            let timer = remainingTime;
+            if(remainingTime === 'NaN' || !remainingTime) {
+                timer = 2;
+            }
             roundTimer.removeFeedback();
-            roundOverFeedback.setDuration(remainingTime ?? 2)
+            roundOverFeedback.setDuration(timer)
             roundOverFeedback.render();
         }, this);
     }
