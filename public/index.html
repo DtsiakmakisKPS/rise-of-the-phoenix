@@ -1,26 +1,44 @@
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <link href="style.css" type="text/css" rel="stylesheet" />
-        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet" href="/style.css" />
-        <title>Rise of the Phoenix</title>
-    </head>
-    <body>
-        <div class="volume-control">
-            <button class="volume-button">
-                <img id="volumeOn" src="/assets/audio/volume.svg" alt="volume" class="volume-icon" />
-                <img id="volumeOff" src="/assets/audio/volume-cross.svg" alt="volume" class="volume-icon hidden" />
-            </button>
-            <input type="range" min="0" max="1" step="0.01" value="0.2" class="volume-slider" />
-        </div>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/phaser/3.85.1/phaser.min.js"></script>
-        <script src="/socket.io/socket.io.js"></script>
-        <canvas id="gameCanvas"></canvas>
-        <script type="module" src="/main.js"></script>
-        <script type="module" src="/music-controller.js"></script>
-        <script type="module" src="/round-timer.js"></script>
-    </body>
+  <head>
+    <meta charset="UTF-8" />
+    <link href="style.css" type="text/css" rel="stylesheet" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/style.css" />
+    <title>Rise of the Phoenix</title>
+  </head>
+  <body>
+    <div class="volume-control">
+      <button class="volume-button">
+        <img
+          id="volumeOn"
+          src="/assets/audio/volume.svg"
+          alt="volume"
+          class="volume-icon"
+        />
+        <img
+          id="volumeOff"
+          src="/assets/audio/volume-cross.svg"
+          alt="volume"
+          class="volume-icon hidden"
+        />
+      </button>
+      <input
+        type="range"
+        min="0"
+        max="1"
+        step="0.01"
+        value="0.2"
+        class="volume-slider"
+      />
+    </div>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/phaser/3.85.1/phaser.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <canvas id="gameCanvas"></canvas>
+    <script type="module" src="/main.js"></script>
+    <script type="module" src="/music-controller.js"></script>
+    <script type="module" src="/player-feedback.js"></script>
+  </body>
 </html>

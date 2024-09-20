@@ -1,7 +1,7 @@
-import { musicController } from './music-controller.js';
-import { RoundTimer } from './round-timer.js';
+import {musicController} from "./music-controller.js";
+import {PlayerFeedback} from "./player-feedback.js";
 
-const sizes = {
+const worldSize = {
     width: 4160,
     height: 3840,
 };
@@ -9,12 +9,12 @@ const sizes = {
 // Active sprites available for players
 const activeSpriteKeys = ['adam', 'alex', 'amelia', 'bob'];
 
-const speed = 800;
-let keyA;
-let keyS;
-let keyD;
-let keyW;
-
+const speed = 300;
+var keyA;
+var keyS;
+var keyD;
+var keyW;
+const ZOOM_LEVEL = 0.5;
 class GameScene extends Phaser.Scene {
     constructor() {
         super('scene-game');
@@ -25,12 +25,42 @@ class GameScene extends Phaser.Scene {
         this.entryCollider = null;
     }
 
+    addPlayer(self, playerInfo, spawnPoint, worldLayer, decorationLayer, entryLayer) {
+        const avatarKey = this.animationState === 'idle' ? 'dude_idle' : 'dude';        
+        this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, avatarKey).setOrigin(0.5, 0.5);        
+        this.player.setImmovable(false); // Allow player to move
+        this.player.anims.play(this.animationState, true);
+        // Add overlap detection between player and chairs
+        this.physics.add.overlap(this.player, this.chairs, this.handleChairOverlap, null, this);
+        this.physics.add.collider(this.player, worldLayer);        
+        this.physics.add.collider(this.player, decorationLayer);
+        this.entryCollider = this.physics.add.collider(this.player, entryLayer);
+        this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
+        this.cameras.main.setZoom(2); // Adjust the zoom level as desired
+        this.cameras.main.setBounds(0, 0, worldSize.width, worldSize.height); // Set camera bounds to the map size
+    }
+
+    addOtherPlayer(self, playerInfo) {
+        const avatarKey = this.animationState === 'idle' ? 'dude_idle' : 'dude';
+        const otherPlayer = this.physics.add.sprite(playerInfo.x, playerInfo.y,avatarKey).setOrigin(0.5,0.5);
+        otherPlayer.playerId = playerInfo.playerId;
+        otherPlayer.setImmovable(false);
+        this.otherPlayers.add(otherPlayer);
+    }
+
+    startLobby() {
+        this.events.emit('startLobby');
+        console.log('Pre Game Phase!');
+    }
+
     startGame() {
         this.events.emit('startGame');
+        console.log('Game started!');
     }
 
     stopGame() {
         this.events.emit('stopGame');
+        console.log('Game stopped!');
     }
 
     preload() {
@@ -78,14 +108,15 @@ class GameScene extends Phaser.Scene {
         this.socket = io();
         const self = this;
 
+        // React to UI Events
         const HUD = this.scene.get('HUD');
-        HUD.events.on(
-            'roundTimerEnd',
-            function () {
-                this.stopGame();
-            },
-            this,
-        );
+        HUD.events.on('preGameEnd', function () {
+            this.startGame();
+        }, this);
+        HUD.events.on('roundTimerEnd', function () {
+            this.stopGame();
+        }, this);
+
 
         // Load and configure the tilemap
         const map = this.make.tilemap({ key: 'map' });
@@ -98,30 +129,30 @@ class GameScene extends Phaser.Scene {
         // const tilesetExtended = map.addTilesetImage('Room_Builder_32x32', 'walls_extended');
         // const decorationsetExtended = map.addTilesetImage('Interiors_32x32', 'decoration_extended');
 
-        const belowLayer = map.createLayer('floor', tileset, 0, 0);
-        const worldLayer = map.createLayer('walls', [tileset, decorationset], 0, 0);
-        const entryLayer = map.createLayer('entry', tileset, 0, 0);
-        const decorationLayer = map.createLayer('decorations', decorationset, 0, 0);
+        const belowLayer = map.createLayer("floor", tileset, 0, 0);
+        const worldLayer = map.createLayer("walls", [tileset, decorationset], 0, 0);
+        const entryLayer = map.createLayer("entry", tileset, 0, 0);
+        const decorationLayer = map.createLayer("decorations", decorationset, 0, 0);
 
         worldLayer.setCollisionByProperty({ collides: true });
         decorationLayer.setCollisionByProperty({ collides: true });
         entryLayer.setCollisionByProperty({ collides: true });
+        game.scale.resize(window.innerWidth/ZOOM_LEVEL, window.innerHeight/ZOOM_LEVEL);
 
-        // Assign a collider if needed
-        // Example:
-        // this.entryCollider = this.physics.add.collider(this.player, entryLayer);
+        this.resizing(this.cameras);
 
-        // setTimeout(function () {
-        //     console.log(self.entryCollider);
-        //     if (self.entryCollider) {
-        //         console.log('entryLayer', entryLayer);
-        //         self.physics.world.removeCollider(self.entryCollider);
-        //         entryLayer.destroy();
-        //     }
-        // }, 5000);
-
-        // Setup input controls
+        setTimeout(function() {         
+            console.log(self.entryCollider);   
+            if (self.entryCollider) {
+                console.log("entryLayer", entryLayer);
+                self.physics.world.removeCollider(self.entryCollider);
+                entryLayer.destroy();   
+            }         
+        }, 5000);
+                
         this.cursor = this.input.keyboard.createCursorKeys();
+
+        //add WASD Keys for animations
         keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
         keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
@@ -217,59 +248,7 @@ class GameScene extends Phaser.Scene {
                 repeat: -1,
             });
 
-            // Right
-            this.anims.create({
-                key: `${spriteKey}_right`,
-                frames: this.anims.generateFrameNumbers(spriteKey, { start: 0, end: 5 }),
-                frameRate: 10,
-                repeat: -1,
-            });
-
-            // Up
-            this.anims.create({
-                key: `${spriteKey}_up`,
-                frames: this.anims.generateFrameNumbers(spriteKey, { start: 6, end: 11 }),
-                frameRate: 10,
-                repeat: -1,
-            });
-
-            // Down (corrected to use `${spriteKey}_idle` or appropriate frames)
-            this.anims.create({
-                key: `${spriteKey}_down`,
-                frames: this.anims.generateFrameNumbers(`${spriteKey}`, { start: 18, end: 23 }),
-                frameRate: 10,
-                repeat: -1,
-            });
-        });
-    }
-
-    addPlayer(playerInfo, spawnPoint, worldLayer, decorationLayer) {
-        const avatarKey = `${playerInfo.playerSprite}_idle`;
-        this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, avatarKey).setOrigin(0.5, 0.5);
-        this.player.playerId = playerInfo.playerId;
-        this.player.playerSprite = playerInfo.playerSprite;
-        this.player.animationState = playerInfo.animationState || 'idle';
-        this.player.setImmovable(false); // Allow player to move
-        this.player.anims.play(`${playerInfo.playerSprite}_${this.player.animationState}`, true); // Play initial animation
-        this.physics.add.collider(this.player, worldLayer);
-        this.physics.add.collider(this.player, decorationLayer);
-        this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
-        this.cameras.main.setZoom(5); // Adjust the zoom level as desired
-        this.cameras.main.setBounds(0, 0, sizes.width, sizes.height); // Set camera bounds to the map size
-
-        // Add overlap detection between player and chairs
-        this.physics.add.overlap(this.player, this.chairs, this.handleChairOverlap, null, this);
-    }
-
-    addOtherPlayer(playerInfo) {
-        const avatarKey = `${playerInfo.playerSprite}_idle`;
-        const otherPlayer = this.physics.add.sprite(playerInfo.x, playerInfo.y, avatarKey).setOrigin(0.5, 0.5);
-        otherPlayer.playerId = playerInfo.playerId;
-        otherPlayer.playerSprite = playerInfo.playerSprite;
-        otherPlayer.animationState = playerInfo.animationState || 'idle';
-        otherPlayer.setImmovable(false);
-        otherPlayer.anims.play(`${playerInfo.playerSprite}_${otherPlayer.animationState}`, true);
-        this.otherPlayers.add(otherPlayer);
+        this.startLobby();
     }
 
     handleChairOverlap(player, chairZone) {
@@ -279,20 +258,17 @@ class GameScene extends Phaser.Scene {
             chairZone.hasAlerted = true; // Set a flag to prevent repeated alerts
 
             // Optionally, reset the flag after some time to allow future alerts
-            this.time.delayedCall(
-                1000, // Delay in milliseconds
-                () => {
-                    chairZone.hasAlerted = false;
-                },
-                [],
-                this,
-            );
+            this.time.delayedCall(1000, () => {
+                chairZone.hasAlerted = false;
+            }, [], this);
+            this.stopGame();
         }
     }
 
     update() {
-        if (this.player) {
-            const { up, down, left, right } = this.cursor;
+        // this.cameras.main.setZoom(5)
+        if(this.player) {
+            const {up, down, left , right} = this.cursor;
             this.player.setVelocity(0);
             let moving = false;
             let newAnimation = this.player.animationState;
@@ -357,6 +333,14 @@ class GameScene extends Phaser.Scene {
 // Helper function to capitalize sprite keys
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
+    resizing(cameras) {
+        window.addEventListener("resize", () => {
+            game.scale.resize(window.innerWidth/ZOOM_LEVEL, window.innerHeight/ZOOM_LEVEL);
+            cameras.main.setZoom(3); // Adjust the zoom level as desired
+        },false
+
+        );
+    }
 }
 
 const gameCanvas = document.getElementById('gameCanvas'); // Ensure this element exists in your HTML
@@ -366,46 +350,63 @@ class HUD extends Phaser.Scene {
         super({ key: 'HUD', active: true });
     }
 
-    create() {
-        const roundTimer = new RoundTimer(this);
-        roundTimer.initiateRoundTimer();
-
+    create ()
+    {
         const Game = this.scene.get('scene-game');
-        Game.events.on(
-            'startGame',
-            function () {
-                roundTimer.startRoundTimer();
-            },
-            this,
-        );
 
-        Game.events.on(
-            'stopGame',
-            function () {
-                roundTimer.stopRoundTimer(); // Assuming such a method exists
-            },
+
+        const preGameCounter = new PlayerFeedback(
             this,
+            'Game starts in: ',
+            worldSize,
+            { x: worldSize.width / 2, y: (worldSize.height / 2) - 500 },);
+        preGameCounter.addCountdown('preGameEnd', 10);
+        preGameCounter.setBackgroundColor('#000', 0.3);
+        Game.events.on('startLobby', function () {
+            preGameCounter.render();
+        }, this);
+
+        const roundTimer = new PlayerFeedback(
+            this,
+            'Round Timer: ',
+            worldSize,
+            { x: worldSize.width / 2, y: 300 },
         );
+        roundTimer.addCountdown('roundTimerEnd', 150);
+        roundTimer.setBackgroundColor('#001e3c', 0.8);
+        Game.events.on('startGame', function () {
+            roundTimer.render();
+        }, this);
+
+        const roundOverFeedback = new PlayerFeedback(this, 'Round Over!', worldSize);
+        roundOverFeedback.setBackgroundColor('#000', 0.3);
+        Game.events.on('stopGame', function () {
+            roundOverFeedback.render();
+        }, this);
     }
 }
 
 const config = {
     type: Phaser.CANVAS,
-    width: sizes.width,
-    height: sizes.height,
+    width: 1750,
+    height: 600,
     canvas: gameCanvas,
     scale: {
-        mode: Phaser.Scale.CENTER_BOTH,
-        autoCenter: Phaser.Scale.CENTER_BOTH,
+        mode: Phaser.Scale.NONE,
+        width: window.innerWidth/ZOOM_LEVEL,
+        height: window.innerHeight/ZOOM_LEVEL,
+        zoom: ZOOM_LEVEL
+
     },
     physics: {
         default: 'arcade',
         arcade: {
             gravity: { y: 0 },
-            debug: false,
-        },
+            debug: false
+        }
+
     },
-    scene: [GameScene, HUD],
-};
+    scene: [GameScene, HUD]
+}
 
 const game = new Phaser.Game(config);

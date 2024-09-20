@@ -1,11 +1,30 @@
 body {
-    margin: 0;
+  margin: 0;
+  background-image: url(assets/fire.jpg);
+  background-size: cover;
+}
+
+.logo {
+    margin: 20px auto 30px auto;
+    display: block;
+}
+
+.game-wrapper {
+    width: 1700px;
+    height: 600px;
+    outline: 20px orange ridge;
+    margin: 20px auto;
 }
 
 .volume-slider {
     opacity: 1;
     transition: 1s;
     accent-color: #1c274c;
+}
+
+.volume-slider:focus {
+    outline: none;
+    box-shadow: none;
 }
 
 .volume-control {
@@ -44,6 +63,19 @@ body {
     border: none;
 }
 
+.volume-button:focus {
+    outline: none;
+    box-shadow: none;
+}
+
 .hidden {
     display: none;
+}
+
+canvas {
+  display: block;
+  margin: 0;
+  position: relative;
+  left: 0;
+  top: 0;
 }
