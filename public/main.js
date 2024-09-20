@@ -16,6 +16,7 @@ let keyS;
 let keyD;
 let keyW;
 const ZOOM_LEVEL = 2;
+let spawnPoint = { x: 3684, y: 649 };
 
 class GameScene extends Phaser.Scene {
     constructor() {
@@ -317,7 +318,7 @@ class GameScene extends Phaser.Scene {
 
     handleChairOverlap(player, chairZone) {
         if (!chairZone.taken) {
-            // finalPopup.classList.remove('hidden');
+            this.gameWonFeedback.classList.remove('hidden');
             player.body.setVelocity(0);
             this.physics.pause();
             //Event Emitter chair found
