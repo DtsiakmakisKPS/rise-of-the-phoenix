@@ -13,7 +13,7 @@ const activeSpriteKeys = ['adam', 'alex', 'amelia', 'bob'];
 let players = {};
 const PORT = process.env.PORT || 3000;
 const ipMap = {};
-const BLOCK_IP = true;
+const BLOCK_IP = false;
 
 const gameLoop = new GameLoop(io);
 
