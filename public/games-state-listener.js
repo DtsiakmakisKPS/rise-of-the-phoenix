@@ -3,7 +3,8 @@ export function gamesStateListeners(game) {
     game.socket.on('phaseChange', (data) => {
         const { phase, phaseEndTime } = data;
         console.log(`Phase changed to: ${phase}`);
-        const remainingTime = Math.max(0, Math.floor((phaseEndTime - Date.now()) / 1000));
+        const remainingTime = Math.floor(phaseEndTime / 1000);
+        console.log(`Remaining time: ${remainingTime}`);
 
         switch(phase) {
             case 'PRE_GAME':

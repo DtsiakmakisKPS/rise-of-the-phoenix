@@ -53,6 +53,7 @@ export default class GameLoop {
     }
 
     getRemainingTime() {
+        console.log(`Remaining time: ${this.phaseEndTime - Date.now()}`);
         if (this.phaseEndTime) {
             return Math.max(0, this.phaseEndTime - Date.now());
         } else {

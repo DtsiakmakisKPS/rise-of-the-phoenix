@@ -81,7 +81,6 @@ class GameScene extends Phaser.Scene {
 
     startGame(remainingTime) {
         this.events.emit('startGame', remainingTime);
-        this.physics.resume();
         if (this.entryCollider) {
             this.physics.world.removeCollider(this.entryCollider);
             this.entryLayer.setVisible(false);
@@ -94,7 +93,6 @@ class GameScene extends Phaser.Scene {
         this.physics.world.addCollider(this.player, this.entryCollider);
         this.entryLayer.setVisible(true);
         this.respawnPlayer();
-        this.physics.pause();
         console.log('Game stopped!');
     }
 
@@ -209,7 +207,6 @@ class GameScene extends Phaser.Scene {
 
         this.socket.on('chairFound', () => {
             console.log('END GAME');
-            //There is still logic needed, to respawn people
         });
 
 
@@ -335,7 +332,7 @@ class GameScene extends Phaser.Scene {
     }
 
     handleCoffeeBreak(player, chairZone) {
-        if (chairZone.isActiveForBreak) {
+        if (chairZone.isActiveForBreak && !chairZone.taken) {
             const breakPopup = document.querySelector('.break-popup');
             breakPopup.classList.remove('hidden');
             player.body.setVelocity(0);
@@ -454,22 +451,34 @@ class HUD extends Phaser.Scene {
 
         Game.events.on('startLobby', function (remainingTime) {
             console.log('startLobby', remainingTime);
+            let timer = remainingTime;
+            if(remainingTime === 'NaN' || !remainingTime) {
+                timer = 10;
+            }
             roundOverFeedback.removeFeedback();
-            preGameCounter.addCountdown('preGameEnd', remainingTime ?? 10);
+            preGameCounter.addCountdown('preGameEnd', timer);
             preGameCounter.render();
         }, this);
 
         Game.events.on('startGame', function (remainingTime) {
             console.log('startGame', remainingTime);
+            let timer = remainingTime;
+            if(remainingTime === 'NaN' || !remainingTime) {
+                timer = 60;
+            }
             preGameCounter.removeFeedback();
-            roundTimer.addCountdown('roundTimerEnd', remainingTime ?? 60);
+            roundTimer.addCountdown('roundTimerEnd', timer);
             roundTimer.render();
         }, this);
 
         Game.events.on('stopGame', function (remainingTime) {
             console.log('stopGame', remainingTime);
+            let timer = remainingTime;
+            if(remainingTime === 'NaN' || !remainingTime) {
+                timer = 2;
+            }
             roundTimer.removeFeedback();
-            roundOverFeedback.setDuration(remainingTime ?? 2)
+            roundOverFeedback.setDuration(timer)
             roundOverFeedback.render();
         }, this);
     }

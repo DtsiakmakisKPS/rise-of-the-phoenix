@@ -57,7 +57,11 @@ io.on('connection', function (socket) {
     // Notify all other players about the new player
     socket.broadcast.emit('newPlayer', players[socket.id]);
 
-    socket.emit('phaseChange', { phase: gameLoop.getCurrentPhase() });
+
+    socket.emit('phaseChange', {
+        phase: gameLoop.getCurrentPhase(),
+        phaseEndTime: gameLoop.getRemainingTime()
+    });
     // Handle player disconnection
     socket.on('disconnect', function () {
         console.log(`User disconnected: ${socket.id}`);
