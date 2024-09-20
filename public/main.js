@@ -29,9 +29,10 @@ class GameScene extends Phaser.Scene {
         this.playerSprite = 'bob';
         this.animationState = 'idle';
         this.musicController = null;
+        this.entryLayer = null;
     }
 
-    addPlayer(playerInfo, spawnPoint, worldLayer, decorationLayer, entryLayer) {
+    addPlayer(playerInfo, spawnPoint, worldLayer, decorationLayer) {
         const avatarKey = `${playerInfo.playerSprite}_idle`;
         this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, avatarKey).setOrigin(0.5, 0.5);
         this.player.playerId = playerInfo.playerId;
@@ -43,7 +44,7 @@ class GameScene extends Phaser.Scene {
         this.player.anims.play(`${playerInfo.playerSprite}_${this.player.animationState}`, true); // Play initial animation
         this.physics.add.collider(this.player, worldLayer);
         this.physics.add.collider(this.player, decorationLayer);
-        this.entryCollider = this.physics.add.collider(this.player, entryLayer);
+        this.entryCollider = this.physics.add.collider(this.player, this.entryLayer);
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
         this.cameras.main.setZoom(1); // Adjust the zoom level as desired
         this.cameras.main.setBounds(0, 0, worldSize.width, worldSize.height);
@@ -71,11 +72,17 @@ class GameScene extends Phaser.Scene {
 
     startGame(remainingTime) {
         this.events.emit('startGame', remainingTime);
+        if (this.entryCollider) {            
+            this.physics.world.removeCollider(this.entryCollider);
+            this.entryLayer.setVisible(false);
+        }
         console.log('Game started!');
     }
 
     stopGame(remainingTime) {
         this.events.emit('stopGame', remainingTime);
+        this.physics.world.addCollider(this.player, this.entryCollider);
+        this.entryLayer.setVisible(true);
         console.log('Game stopped!');
     }
 
@@ -139,21 +146,12 @@ class GameScene extends Phaser.Scene {
 
         const belowLayer = map.createLayer("floor", tileset, 0, 0);
         const worldLayer = map.createLayer("walls", [tileset, decorationset], 0, 0);
-        const entryLayer = map.createLayer("entry", tileset, 0, 0);
+        this.entryLayer = map.createLayer("entry", tileset, 0, 0);
         const decorationLayer = map.createLayer("decorations", decorationset, 0, 0);
 
         worldLayer.setCollisionByProperty({collides: true});
         decorationLayer.setCollisionByProperty({collides: true});
-        entryLayer.setCollisionByProperty({collides: true});        
-
-        setTimeout(() => {
-            console.log(this.entryCollider);
-            if (this.entryCollider) {
-                console.log("entryLayer", entryLayer);
-                this.physics.world.removeCollider(this.entryCollider);
-                entryLayer.destroy();
-            }
-        }, 5000);
+        this.entryLayer.setCollisionByProperty({collides: true});        
 
         this.cursor = this.input.keyboard.createCursorKeys();
 
@@ -171,7 +169,7 @@ class GameScene extends Phaser.Scene {
             console.log(players, this.socket.id);
             Object.keys(players).forEach((id) => {
                 if (players[id].playerId === this.socket.id) {
-                    this.addPlayer(players[id], spawnPoint, worldLayer, decorationLayer, entryLayer);
+                    this.addPlayer(players[id], spawnPoint, worldLayer, decorationLayer);
                 } else {
                     this.addOtherPlayer(players[id]);
                 }
