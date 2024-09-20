@@ -426,7 +426,7 @@ const config = {
     canvas: gameCanvas,
     scale: {
         parent: 'game-wrapper',
-        mode: Phaser.Scale.FIT,
+        mode: Phaser.Scale.RESIZE,
         width: 1700,
         height: 650,
     },

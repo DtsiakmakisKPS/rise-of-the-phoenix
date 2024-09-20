@@ -10,8 +10,8 @@ body {
 }
 
 .game-wrapper {
-    width: 1700px;
-    height: 650px;
+    width: calc(100vw - 200px);
+    height: calc(100vh - 300px);
     outline: 20px orange ridge;
     margin: 20px auto;
 }
