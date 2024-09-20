@@ -13,7 +13,7 @@ const activeSpriteKeys = ['adam', 'alex', 'amelia', 'bob'];
 let players = {};
 const PORT = process.env.PORT || 3000;
 const ipMap = {};
-const BLOCK_IP = true;
+const BLOCK_IP = false;
 
 const gameLoop = new GameLoop(io);
 
@@ -69,6 +69,11 @@ io.on('connection', function (socket) {
         socket.broadcast.emit('playerRemoved', socket.id);
         delete ipMap[ipAddress];
     });
+
+    socket.on('chairFound', function(){
+        socket.broadcast.emit('chairFound', players[socket.id]);
+        socket.broadcast.emit('phaseChange', { phase: 'GAME_BREAK'});
+    })
 
     // Handle player movement and animation updates
     socket.on('playerMovement', function (movementData) {

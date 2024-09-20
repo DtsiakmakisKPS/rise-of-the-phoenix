@@ -197,6 +197,12 @@ class GameScene extends Phaser.Scene {
             });
         });
 
+        this.socket.on('chairFound', () => {
+            console.log('END GAME');
+            //There is still logic needed, to respawn people
+        });
+
+
         // Handle player removal
         this.socket.on('playerRemoved', (playerId) => {
             this.otherPlayers.getChildren().forEach((otherPlayer) => {
@@ -306,9 +312,13 @@ class GameScene extends Phaser.Scene {
     handleChairOverlap(player, chairZone) {
         const finalPopup = document.querySelector('.final-popup')
         if (!chairZone.taken) {
-            finalPopup.classList.remove('hidden')
+            // finalPopup.classList.remove('hidden');
             player.body.setVelocity(0);
             this.physics.pause();
+            //Event Emitter chair found
+            this.socket.emit('chairFound', this.socket.id);
+           
+
         }
     }
 
