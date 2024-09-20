@@ -372,10 +372,12 @@ class GameScene extends Phaser.Scene {
                 x: this.player.x,
                 y: this.player.y,
             };
-        }
-        if (this.alreadyPlayingInOtherTab) {
-            console.log('already playing');
+        }     
+        
+        if (this.alreadyPlayingInOtherTab) {            
             this.musicController.stopMusic();
+            this.add.rectangle(0, 0, worldSize.width, worldSize.height, 0x000000);
+            this.add.text(100, 100, "You entered the game with your current IP address already!", { font: '25px Arial', fill: '#fff' });
         }
     }
 }
@@ -442,7 +444,7 @@ const config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 0 },
-            debug: true
+            debug: false
         }
     },
     scene: [GameScene, HUD]
