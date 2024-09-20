@@ -80,7 +80,7 @@ canvas {
   top: 0;
 }
 
-.final-popup {
+.popup {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -90,8 +90,7 @@ canvas {
     left: 50%;
     transform: translate(-50%, -50%);
     right: auto;
-    z-index: 1;
-    background-color: darkgreen;
+    z-index: 1;    
     color: white;
     box-shadow: 0 5px 40px 10px rgba(0,0,0,0.5);
     padding: 25px 30px;
@@ -109,4 +108,13 @@ canvas {
     p {
         margin: 10px 0 0;
     }
+}
+
+.final-popup {
+    background-color: darkgreen;
+}
+
+.break-popup {
+    background-color: #fff;
+    color: black;
 }

@@ -53,6 +53,7 @@ class GameScene extends Phaser.Scene {
 
         // Add overlap detection between player and chairs
         this.physics.add.overlap(this.player, this.chairs, this.handleChairOverlap, null, this);
+        this.physics.add.collider(this.player, this.chairs, this.handleCoffeeBreak, null, this);
     }
 
     addOtherPlayer(playerInfo) {
@@ -243,6 +244,7 @@ class GameScene extends Phaser.Scene {
         });
 
         // Iterate through each chair object from the tilemap and create a Zone
+        const activeChairIndex = Phaser.Math.Between(0, chairObjects.length - 1);
         chairObjects.forEach((chair, index) => {
             chair.taken = (index !== availableChairIndex);
 
@@ -253,6 +255,8 @@ class GameScene extends Phaser.Scene {
             chairZone.body.setOffset(0, 0);
             chairZone.isChair = true;
             chairZone.taken = chair.taken;
+            chairZone.isActiveForBreak = (index === activeChairIndex);
+
 
             // Add the zone to the chairs group
             this.chairs.add(chairZone);
@@ -327,6 +331,19 @@ class GameScene extends Phaser.Scene {
 
         }
     }
+
+    handleCoffeeBreak(player, chairZone) {
+        if (chairZone.isActiveForBreak) {
+            const breakPopup = document.querySelector('.break-popup');
+            breakPopup.classList.remove('hidden');
+            player.body.setVelocity(0);
+            this.physics.pause();
+            chairZone.isActiveForBreak = false;
+            setTimeout(() => {
+                breakPopup.classList.add('hidden');
+                this.physics.resume();
+                }, 3000)  ;
+        }}
 
     update() {
         if (this.player) {
