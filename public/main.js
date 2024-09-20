@@ -14,7 +14,7 @@ let keyA;
 let keyS;
 let keyD;
 let keyW;
-const ZOOM_LEVEL = 0.5;
+const ZOOM_LEVEL = 2;
 
 class GameScene extends Phaser.Scene {
     constructor() {
@@ -40,7 +40,7 @@ class GameScene extends Phaser.Scene {
         this.physics.add.collider(this.player, decorationLayer);
         this.entryCollider = this.physics.add.collider(this.player, entryLayer);
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
-        this.cameras.main.setZoom(5); // Adjust the zoom level as desired
+        this.cameras.main.setZoom(1); // Adjust the zoom level as desired
         this.cameras.main.setBounds(0, 0, worldSize.width, worldSize.height);
 
         // Add overlap detection between player and chairs
@@ -146,9 +146,9 @@ class GameScene extends Phaser.Scene {
         worldLayer.setCollisionByProperty({ collides: true });
         decorationLayer.setCollisionByProperty({ collides: true });
         entryLayer.setCollisionByProperty({ collides: true });
-        this.scale.resize(window.innerWidth / ZOOM_LEVEL, window.innerHeight / ZOOM_LEVEL);
+        //this.scale.resize(window.innerWidth / ZOOM_LEVEL, window.innerHeight / ZOOM_LEVEL);
 
-        this.resizing();
+        //this.resizing();
 
         setTimeout(() => {
             console.log(this.entryCollider);
@@ -360,13 +360,14 @@ class GameScene extends Phaser.Scene {
             };
         }
     }
-
+    /*
     resizing() {
         window.addEventListener("resize", () => {
             this.scale.resize(window.innerWidth / ZOOM_LEVEL, window.innerHeight / ZOOM_LEVEL);
             this.cameras.main.setZoom(3); // Adjust the zoom level as desired
         }, false);
     }
+    */
 }
 
 // Helper function to capitalize sprite keys
@@ -418,14 +419,14 @@ class HUD extends Phaser.Scene {
 
 const config = {
     type: Phaser.CANVAS,
-    width: 1750,
-    height: 600,
+    width: 1700,
+    height: 650,
     canvas: gameCanvas,
     scale: {
-        mode: Phaser.Scale.NONE,
-        width: window.innerWidth / ZOOM_LEVEL,
-        height: window.innerHeight / ZOOM_LEVEL,
-        zoom: ZOOM_LEVEL
+        parent: 'game-wrapper',
+        mode: Phaser.Scale.FIT,
+        width: 1700,
+        height: 650,
     },
     physics: {
         default: 'arcade',

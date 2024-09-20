@@ -11,7 +11,7 @@ body {
 
 .game-wrapper {
     width: 1700px;
-    height: 600px;
+    height: 650px;
     outline: 20px orange ridge;
     margin: 20px auto;
 }
