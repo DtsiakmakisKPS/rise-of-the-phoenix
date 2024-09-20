@@ -32,6 +32,8 @@ class GameScene extends Phaser.Scene {
         const avatarKey = `${playerInfo.playerSprite}_idle`;
         this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, avatarKey).setOrigin(0.5, 0.5);
         this.player.playerId = playerInfo.playerId;
+        this.player.body.setSize(this.player.width, this.player.height - 20);
+        this.player.body.setOffset(0, 20);
         this.player.playerSprite = playerInfo.playerSprite;
         this.player.animationState = playerInfo.animationState || 'idle';
         this.player.setImmovable(false); // Allow player to move
