@@ -81,6 +81,7 @@ class GameScene extends Phaser.Scene {
 
     startGame(remainingTime) {
         this.events.emit('startGame', remainingTime);
+        this.physics.resume();
         if (this.entryCollider) {
             this.physics.world.removeCollider(this.entryCollider);
             this.entryLayer.setVisible(false);
@@ -93,6 +94,7 @@ class GameScene extends Phaser.Scene {
         this.physics.world.addCollider(this.player, this.entryCollider);
         this.entryLayer.setVisible(true);
         this.respawnPlayer();
+        this.physics.pause();
         console.log('Game stopped!');
     }
 
