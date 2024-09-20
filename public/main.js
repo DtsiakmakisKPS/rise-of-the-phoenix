@@ -1,50 +1,60 @@
-import {musicController} from "./music-controller.js";
-import {PlayerFeedback} from "./player-feedback.js";
+import { musicController } from "./music-controller.js";
+import { PlayerFeedback } from "./player-feedback.js";
 
 const worldSize = {
     width: 4160,
-    height: 3840
-}
+    height: 3840,
+};
+
+// Active sprites available for players
+const activeSpriteKeys = ['adam', 'alex', 'amelia', 'bob'];
 
 const speed = 300;
-var keyA;
-var keyS;
-var keyD;
-var keyW;
+let keyA;
+let keyS;
+let keyD;
+let keyW;
 const ZOOM_LEVEL = 0.5;
+
 class GameScene extends Phaser.Scene {
     constructor() {
         super('scene-game');
         this.player = null;
         this.otherPlayers = null;
-        this.cursor;
-        this.animationState = 'idle';
+        this.cursor = null;
         this.playerSpeed = speed + 50;
-        this.currentAnimation = 'idle';
-        this.chairs = null; // Group to hold chair zones
         this.entryCollider = null;
+        this.playerSprite = 'bob'
+        this.animationState = 'idle'; // Initialize animationState
     }
 
-    addPlayer(self, playerInfo, spawnPoint, worldLayer, decorationLayer, entryLayer) {
-        const avatarKey = this.animationState === 'idle' ? 'dude_idle' : 'dude';        
-        this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, avatarKey).setOrigin(0.5, 0.5);        
+    addPlayer(playerInfo, spawnPoint, worldLayer, decorationLayer, entryLayer) {
+        const avatarKey = `${playerInfo.playerSprite}_idle`;
+        this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, avatarKey).setOrigin(0.5, 0.5);
+        this.player.playerId = playerInfo.playerId;
+        this.player.playerSprite = playerInfo.playerSprite;
+        this.player.animationState = playerInfo.animationState || 'idle';
         this.player.setImmovable(false); // Allow player to move
-        this.player.anims.play(this.animationState, true);
-        // Add overlap detection between player and chairs
-        this.physics.add.overlap(this.player, this.chairs, this.handleChairOverlap, null, this);
-        this.physics.add.collider(this.player, worldLayer);        
+        this.player.anims.play(`${playerInfo.playerSprite}_${this.player.animationState}`, true); // Play initial animation
+        this.physics.add.collider(this.player, worldLayer);
         this.physics.add.collider(this.player, decorationLayer);
         this.entryCollider = this.physics.add.collider(this.player, entryLayer);
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
-        this.cameras.main.setZoom(2); // Adjust the zoom level as desired
-        this.cameras.main.setBounds(0, 0, worldSize.width, worldSize.height); // Set camera bounds to the map size
+        this.cameras.main.setZoom(5); // Adjust the zoom level as desired
+        this.cameras.main.setBounds(0, 0, worldSize.width, worldSize.height);
+
+        // Add overlap detection between player and chairs
+        this.physics.add.overlap(this.player, this.chairs, this.handleChairOverlap, null, this);
     }
 
-    addOtherPlayer(self, playerInfo) {
-        const avatarKey = this.animationState === 'idle' ? 'dude_idle' : 'dude';
-        const otherPlayer = this.physics.add.sprite(playerInfo.x, playerInfo.y,avatarKey).setOrigin(0.5,0.5);          
-        otherPlayer.playerId = playerInfo.playerId;        
-        otherPlayer.setImmovable(false);         
+    addOtherPlayer(playerInfo) {
+        const avatarKey = `${playerInfo.playerSprite}_idle`;
+        const otherPlayer = this.physics.add.sprite(playerInfo.x, playerInfo.y, avatarKey).setOrigin(0.5, 0.5);
+        otherPlayer.playerId = playerInfo.playerId;
+        otherPlayer.playerSprite = playerInfo.playerSprite;
+        otherPlayer.animationState = playerInfo.animationState || 'idle';
+        otherPlayer.setImmovable(false);
+        otherPlayer.anims.play(`${playerInfo.playerSprite}_${otherPlayer.animationState}`, true);
         this.otherPlayers.add(otherPlayer);
     }
 
@@ -63,155 +73,220 @@ class GameScene extends Phaser.Scene {
         console.log('Game stopped!');
     }
 
-    preload(){
-        this.load.image('walls', 'assets/Room_Builder_free_32x32.png');
-        this.load.image('decoration', 'assets/Interiors_free_32x32.png');
-        this.load.tilemapTiledJSON('map', 'assets/world.json');
-        this.load.spritesheet('dude', 'assets/Bob_run_32x32.png', {
-            frameWidth: 32,
-            frameHeight: 64,
+    preload() {
+        // Load map assets
+        this.load.image('walls', 'assets/map/Room_Builder_free_32x32.png');
+        this.load.image('decoration', 'assets/map/Interiors_free_32x32.png');
+        // this.load.image('walls_extended', 'assets/map/Room_Builder_32x32.png');
+        // this.load.image('decoration_extended', 'assets/map/Interiors_32x32.png');
+        this.load.tilemapTiledJSON('map', 'assets/map/world.json');
+
+        // Load sprites for each active sprite key
+        activeSpriteKeys.forEach((spriteKey) => {
+            // Load run animation
+            this.load.spritesheet(spriteKey, `assets/sprites/${spriteKey}/${capitalize(spriteKey)}_run_32x32.png`, {
+                frameWidth: 32,
+                frameHeight: 64,
+            });
+
+            // Load idle animation
+            this.load.spritesheet(
+                `${spriteKey}_idle`,
+                `assets/sprites/${spriteKey}/${capitalize(spriteKey)}_idle_anim_32x32.png`,
+                {
+                    frameWidth: 32,
+                    frameHeight: 64,
+                },
+            );
         });
-        this.load.spritesheet('dude_idle', 'assets/Bob_idle_anim_32x32.png', {
-            frameWidth: 32,
-            frameHeight: 64,
-        });
-        this.load.audio('backgroundMusic', 'assets/game-bg-music.mp3');
+
+        // Load npc sprites
+        this.load.spritesheet(
+            `bob_sit`,
+            `assets/sprites/bob/Bob_sit_32x32.png`,
+            {
+                frameWidth: 48,
+                frameHeight: 64,
+            },
+        );
+
+        // Load audio
+        this.load.audio('backgroundMusic', 'assets/audio/game-bg-music.mp3');
     }
 
-    create(){    
+    create() {
         this.socket = io();
-        var self = this;
+        const self = this;
 
         // React to UI Events
         const HUD = this.scene.get('HUD');
-        HUD.events.on('preGameEnd', function () {
+        HUD.events.on('preGameEnd', () => {
             this.startGame();
         }, this);
-        HUD.events.on('roundTimerEnd', function () {
+        HUD.events.on('roundTimerEnd', () => {
             this.stopGame();
         }, this);
 
-        // Define animations
-        this.anims.create({
-            key: 'left',
-            frames: this.anims.generateFrameNumbers('dude', { start: 12, end: 17 }),
-            frameRate: 10,
-            repeat: -1,
-        });
-
-        this.anims.create({
-            key: 'idle',
-            frames: this.anims.generateFrameNumbers('dude_idle', { start: 18, end: 23 }),
-            frameRate: 10,
-        });
-
-        this.anims.create({
-            key: 'right',
-            frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 5 }),
-            frameRate: 10,
-            repeat: -1,
-        });
-
-        // Use frame 4 as a placeholder for up and down movement if no separate animations exist
-        this.anims.create({
-            key: 'up',
-            frames: this.anims.generateFrameNumbers('dude', { start: 6, end: 11 }),
-            frameRate: 10,
-            repeat: -1,
-        });
-
-        this.anims.create({
-            key: 'down',
-            frames: this.anims.generateFrameNumbers('dude', { start: 18, end: 23 }),
-            frameRate: 10,
-            repeat: -1,
-        });
-
+        // Load and configure the tilemap
         const map = this.make.tilemap({ key: 'map' });
-        const spawnPoint = map.findObject("Spawn Point", obj => obj.name === "Spawn Point");
-        const chairObjects = map.getObjectLayer("Chairs")?.objects || []; // Get all chair objects
+        const spawnPoint = map.findObject('Spawn Point', (obj) => obj.name === 'Spawn Point');
+        const chairObjects = map.getObjectLayer('Chairs')?.objects || [];
         musicController(this.sound);
 
         const tileset = map.addTilesetImage('Room_Builder_free_32x32', 'walls');
-        const decorationset = map.addTilesetImage('Interiors_free_32x32', 'decoration');        
+        const decorationset = map.addTilesetImage('Interiors_free_32x32', 'decoration');
+        // const tilesetExtended = map.addTilesetImage('Room_Builder_32x32', 'walls_extended');
+        // const decorationsetExtended = map.addTilesetImage('Interiors_32x32', 'decoration_extended');
 
         const belowLayer = map.createLayer("floor", tileset, 0, 0);
         const worldLayer = map.createLayer("walls", [tileset, decorationset], 0, 0);
         const entryLayer = map.createLayer("entry", tileset, 0, 0);
         const decorationLayer = map.createLayer("decorations", decorationset, 0, 0);
-    
+
         worldLayer.setCollisionByProperty({ collides: true });
         decorationLayer.setCollisionByProperty({ collides: true });
         entryLayer.setCollisionByProperty({ collides: true });
-        game.scale.resize(window.innerWidth/ZOOM_LEVEL, window.innerHeight/ZOOM_LEVEL);
-       
-        this.resizing(this.cameras);
-       
-        setTimeout(function() {         
-            console.log(self.entryCollider);   
-            if (self.entryCollider) {
+        this.scale.resize(window.innerWidth / ZOOM_LEVEL, window.innerHeight / ZOOM_LEVEL);
+
+        this.resizing();
+
+        setTimeout(() => {
+            console.log(this.entryCollider);
+            if (this.entryCollider) {
                 console.log("entryLayer", entryLayer);
-                self.physics.world.removeCollider(self.entryCollider);
-                entryLayer.destroy();   
-            }         
+                this.physics.world.removeCollider(this.entryCollider);
+                entryLayer.destroy();
+            }
         }, 5000);
-                
+
         this.cursor = this.input.keyboard.createCursorKeys();
 
-        //add WASD Keys for animations
+        // Add WASD Keys for animations
         keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
         keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
         keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
-        
+
+        // Initialize groups
         this.otherPlayers = this.physics.add.group();
 
-        this.socket.on('currentPlayers', function (players) {            
-            Object.keys(players).forEach(function (id) {
-                if (players[id].playerId === self.socket.id) {
-                    self.addPlayer(self, players[id], spawnPoint, worldLayer, decorationLayer, entryLayer);
+        // Register socket event handlers using arrow functions to preserve 'this'
+        this.socket.on('currentPlayers', (players) => {
+            console.log(players, this.socket.id);
+            Object.keys(players).forEach((id) => {
+                if (players[id].playerId === this.socket.id) {
+                    this.addPlayer(players[id], spawnPoint, worldLayer, decorationLayer, entryLayer);
                 } else {
-                    self.addOtherPlayer(self, players[id]);
+                    this.addOtherPlayer(players[id]);
                 }
             });
         });
 
-        this.socket.on('newPlayer', function (playerInfo) {
-          self.addOtherPlayer(self, playerInfo);
+        // Handle new player joining
+        this.socket.on('newPlayer', (playerInfo) => {
+            this.addOtherPlayer(playerInfo);
         });
 
-        this.socket.on('playerMoved', function (playerInfo) {             
-            self.otherPlayers.getChildren().forEach(function (otherPlayer) {                
-                if (playerInfo.playerId === otherPlayer.playerId) {                
+        // Handle player movement
+        this.socket.on('playerMoved', (playerInfo) => {
+            this.otherPlayers.getChildren().forEach((otherPlayer) => {
+                if (playerInfo.playerId === otherPlayer.playerId) {
                     otherPlayer.setPosition(playerInfo.x, playerInfo.y);
-                    // TODO: play animation
+                    // Update animation state if it has changed
+                    if (otherPlayer.animationState !== playerInfo.animationState) {
+                        otherPlayer.anims.play(`${otherPlayer.playerSprite}_${playerInfo.animationState}`, true);
+                        otherPlayer.animationState = playerInfo.animationState;
+                    }
                 }
             });
-        });        
+        });
 
+        // Handle player removal
+        this.socket.on('playerRemoved', (playerId) => {
+            this.otherPlayers.getChildren().forEach((otherPlayer) => {
+                if (playerId === otherPlayer.playerId) {
+                    otherPlayer.destroy();
+                }
+            });
+        });
 
         // Create a physics group for chair zones
         this.chairs = this.physics.add.staticGroup();
 
+        // Determine which chair is available (not taken)
+        const availableChairIndex = Phaser.Math.Between(0, chairObjects.length - 1);
+
         // Iterate through each chair object from the tilemap and create a Zone
-        chairObjects.forEach((chair) => {
+        chairObjects.forEach((chair, index) => {
+            chair.taken = (index !== availableChairIndex);
+
             // Create a Zone for each chair
             const chairZone = this.add.zone(chair.x, chair.y - chair.height, chair.width, chair.height);
             this.physics.world.enable(chairZone, Phaser.Physics.Arcade.STATIC_BODY);
             chairZone.body.setSize(chair.width, chair.height);
             chairZone.body.setOffset(0, 0);
             chairZone.isChair = true;
+            chairZone.taken = chair.taken;
 
             // Add the zone to the chairs group
             this.chairs.add(chairZone);
+
+            // Add npc only on taken chairs
+            if (chair.taken) {
+                this.physics.add.sprite(chair.x, chair.y, 'bob_sit').setOrigin(0.6, 0.9);
+            }
         });
 
-        this.startLobby();
+        // Define animations for each sprite
+        activeSpriteKeys.forEach((spriteKey) => {
+            // Left
+            this.anims.create({
+                key: `${spriteKey}_left`,
+                frames: this.anims.generateFrameNumbers(spriteKey, { start: 12, end: 17 }),
+                frameRate: 10,
+                repeat: -1,
+            });
+
+            // Idle
+            this.anims.create({
+                key: `${spriteKey}_idle`,
+                frames: this.anims.generateFrameNumbers(`${spriteKey}_idle`, { start: 18, end: 23 }),
+                frameRate: 10,
+                repeat: -1,
+            });
+
+            // Right
+            this.anims.create({
+                key: `${spriteKey}_right`,
+                frames: this.anims.generateFrameNumbers(spriteKey, { start: 0, end: 5 }),
+                frameRate: 10,
+                repeat: -1,
+            });
+
+            // Up
+            this.anims.create({
+                key: `${spriteKey}_up`,
+                frames: this.anims.generateFrameNumbers(spriteKey, { start: 6, end: 11 }),
+                frameRate: 10,
+                repeat: -1,
+            });
+
+            // Down (corrected to use `${spriteKey}_idle` or appropriate frames)
+            this.anims.create({
+                key: `${spriteKey}_down`,
+                frames: this.anims.generateFrameNumbers(`${spriteKey}`, { start: 18, end: 23 }),
+                frameRate: 10,
+                repeat: -1,
+            });
+        });
+
+        this.startLobby(); // Move outside the forEach loop
     }
 
     handleChairOverlap(player, chairZone) {
-        if (!chairZone.hasAlerted) {
-            alert("You touched a chair!");
+        if (!chairZone.taken && !chairZone.hasAlerted) {
+            // Replace alert with in-game notification if desired
+            alert('You touched an available chair!');
             chairZone.hasAlerted = true; // Set a flag to prevent repeated alerts
 
             // Optionally, reset the flag after some time to allow future alerts
@@ -222,87 +297,102 @@ class GameScene extends Phaser.Scene {
         }
     }
 
-    update(){
-    
+    update() {
         // this.cameras.main.setZoom(5)
-        if(this.player) {
-            const {up, down, left , right} = this.cursor;
+        if (this.player) {
+            const { up, down, left, right } = this.cursor;
             this.player.setVelocity(0);
             let moving = false;
-            let newAnimation = this.currentAnimation;
-            // Horizontal movement
+            let newAnimation = this.player.animationState;
+
+            // Determine movement and set velocity
             if (left.isDown || keyA.isDown) {
                 this.player.setVelocityX(-this.playerSpeed);
-                this.player.anims.play('left', true);
-                moving = true;
                 newAnimation = 'left';
-            }
-            else if (right.isDown || keyD.isDown) {
+                moving = true;
+            } else if (right.isDown || keyD.isDown) {
                 this.player.setVelocityX(this.playerSpeed);
-                this.player.anims.play('right', true);
-                moving = true;
                 newAnimation = 'right';
-            }
-            // Vertical movement
-            else if (up.isDown || keyW.isDown) {
-                this.player.setVelocityY(-this.playerSpeed);
-                this.player.anims.play('up', true);
                 moving = true;
-                newAnimation = 'up';
-            } else if (down.isDown || keyS.isDown) {
-                this.player.setVelocityY(this.playerSpeed);
-                this.player.anims.play('down', true);
-                moving = true;
-                newAnimation = 'down';
             }
 
-            // Idle movement
+            if (up.isDown || keyW.isDown) {
+                this.player.setVelocityY(-this.playerSpeed);
+                newAnimation = 'up';
+                moving = true;
+            } else if (down.isDown || keyS.isDown) {
+                this.player.setVelocityY(this.playerSpeed);
+                newAnimation = 'down';
+                moving = true;
+            }
+
+            // If no movement keys are pressed, set to idle
             if (!moving) {
-                this.player.anims.play('idle', true);
                 newAnimation = 'idle';
             }
-            
-            var x = this.player.x;
-            var y = this.player.y;
-            if (this.player.oldPosition &&  (x !== this.player.oldPosition.x || y !== this.player.oldPosition.y)) {
-                this.socket.emit('playerMovement', { x: this.player.x, y: this.player.y });
-            }    
+
+            // If animation state has changed, play the new animation and emit the change
+            if (newAnimation !== this.player.animationState) {
+                this.player.anims.play(`${this.player.playerSprite}_${newAnimation}`, true);
+                this.player.animationState = newAnimation;
+
+                // Emit the new animation state along with position
+                this.socket.emit('playerMovement', {
+                    x: this.player.x,
+                    y: this.player.y,
+                    animationState: this.player.animationState,
+                });
+            }
+
+            // Emit movement if position has changed
+            const x = this.player.x;
+            const y = this.player.y;
+            if (this.player.oldPosition && (x !== this.player.oldPosition.x || y !== this.player.oldPosition.y)) {
+                this.socket.emit('playerMovement', {
+                    x: this.player.x,
+                    y: this.player.y,
+                    animationState: this.player.animationState,
+                });
+            }
             this.player.oldPosition = {
                 x: this.player.x,
                 y: this.player.y,
-            }        
+            };
         }
     }
-    resizing(cameras) {
-        window.addEventListener("resize", () => {
-            game.scale.resize(window.innerWidth/ZOOM_LEVEL, window.innerHeight/ZOOM_LEVEL);
-            cameras.main.setZoom(3); // Adjust the zoom level as desired
-        },false
 
-        );
+    resizing() {
+        window.addEventListener("resize", () => {
+            this.scale.resize(window.innerWidth / ZOOM_LEVEL, window.innerHeight / ZOOM_LEVEL);
+            this.cameras.main.setZoom(3); // Adjust the zoom level as desired
+        }, false);
     }
 }
 
-class HUD extends Phaser.Scene {
+// Helper function to capitalize sprite keys
+function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
 
-    constructor ()
-    {
+const gameCanvas = document.getElementById('gameCanvas'); // Ensure this element exists in your HTML
+
+class HUD extends Phaser.Scene {
+    constructor() {
         super({ key: 'HUD', active: true });
     }
 
-    create ()
-    {
+    create() {
         const Game = this.scene.get('scene-game');
-
 
         const preGameCounter = new PlayerFeedback(
             this,
             'Game starts in: ',
             worldSize,
-            { x: worldSize.width / 2, y: (worldSize.height / 2) - 500 },);
+            { x: worldSize.width / 2, y: (worldSize.height / 2) - 500 },
+        );
         preGameCounter.addCountdown('preGameEnd', 10);
         preGameCounter.setBackgroundColor('#000', 0.3);
-        Game.events.on('startLobby', function () {
+        Game.events.on('startLobby', () => {
             preGameCounter.render();
         }, this);
 
@@ -314,13 +404,13 @@ class HUD extends Phaser.Scene {
         );
         roundTimer.addCountdown('roundTimerEnd', 150);
         roundTimer.setBackgroundColor('#001e3c', 0.8);
-        Game.events.on('startGame', function () {
+        Game.events.on('startGame', () => {
             roundTimer.render();
         }, this);
 
         const roundOverFeedback = new PlayerFeedback(this, 'Round Over!', worldSize);
         roundOverFeedback.setBackgroundColor('#000', 0.3);
-        Game.events.on('stopGame', function () {
+        Game.events.on('stopGame', () => {
             roundOverFeedback.render();
         }, this);
     }
@@ -330,13 +420,12 @@ const config = {
     type: Phaser.CANVAS,
     width: 1750,
     height: 600,
-    canvas: gameCanvas,    
+    canvas: gameCanvas,
     scale: {
         mode: Phaser.Scale.NONE,
-        width: window.innerWidth/ZOOM_LEVEL,
-        height: window.innerHeight/ZOOM_LEVEL,
+        width: window.innerWidth / ZOOM_LEVEL,
+        height: window.innerHeight / ZOOM_LEVEL,
         zoom: ZOOM_LEVEL
-        
     },
     physics: {
         default: 'arcade',
@@ -344,7 +433,6 @@ const config = {
             gravity: { y: 0 },
             debug: false
         }
-
     },
     scene: [GameScene, HUD]
 }

@@ -2,14 +2,13 @@ export function musicController(sound) {
     const backgroundMusic = sound.add('backgroundMusic', { loop: true });
     backgroundMusic.play();
 
-
     const volumeSlider = document.querySelector('.volume-slider');
     backgroundMusic.setVolume(volumeSlider.value);
 
     volumeSlider.addEventListener('input', (event) => {
         const volume = event.target.value;
         backgroundMusic.setVolume(volume);
-        if(volumeOnIcon.classList.contains('hidden')) {
+        if (volumeOnIcon.classList.contains('hidden')) {
             volumeOnIcon.classList.remove('hidden');
             volumeOffIcon.classList.add('hidden');
         }
@@ -21,7 +20,7 @@ export function musicController(sound) {
     volumeButton.addEventListener('click', (event) => {
         event.preventDefault();
         const volumeOn = !volumeOnIcon.classList.contains('hidden');
-        if(volumeOn) {
+        if (volumeOn) {
             volumeOnIcon.classList.add('hidden');
             volumeOffIcon.classList.remove('hidden');
             volumeSlider.value = 0;

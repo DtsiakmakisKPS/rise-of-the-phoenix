@@ -11,15 +11,15 @@ body {
 
 .game-wrapper {
     width: 1700px;
-    height: 600px;      
-    outline: 20px orange ridge; 
+    height: 600px;
+    outline: 20px orange ridge;
     margin: 20px auto;
 }
 
 .volume-slider {
     opacity: 1;
     transition: 1s;
-    accent-color: #1C274C;
+    accent-color: #1c274c;
 }
 
 .volume-slider:focus {
@@ -35,7 +35,7 @@ body {
     left: 10px;
     z-index: 1;
     border-radius: 50%;
-    border: 2px solid #1C274C;
+    border: 2px solid #1c274c;
     width: 48px;
     height: 48px;
     background-color: #fff;
@@ -52,7 +52,7 @@ body {
 .volume-icon {
     width: 32px;
     height: 32px;
-    margin-right: 10px
+    margin-right: 10px;
 }
 
 .volume-button {
