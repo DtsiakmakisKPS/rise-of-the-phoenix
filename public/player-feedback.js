@@ -2,14 +2,16 @@ export class PlayerFeedback {
     constructor(
         hudScene,
         message = '',
-        sizes = { width: 800, height: 600 },
         position = null,
+        align = 'center',
+        margin = { x: 20, y: 20 }
     ) {
         // Core properties
         this.hudScene = hudScene;
         this.message = message;
-        this.sizes = sizes;
         this.position = position;
+        this.align = align;
+        this.margin = margin;
         this.duration = 2;
         this.type = 'default';
 
@@ -25,12 +27,14 @@ export class PlayerFeedback {
         this.eventName = 'feedbackEvent';
         this.timerEvent = null;
         this.countdownLength = 10;
+
+        this.hudScene.scale.on('resize', this.onResize, this);
     }
 
     // Renders the feedback with optional countdown
     render() {
         const { textWidth, textHeight } = this.renderMessage();
-        this.renderBackground(textWidth + 100, textHeight + 100);
+        // this.renderBackground(textWidth + 100, textHeight + 100);
 
         if (this.type === 'countdown') {
             this.startCountdownTimer();
@@ -51,7 +55,10 @@ export class PlayerFeedback {
         }
 
         this.textNode = this.hudScene.add.text(x, y, displayMessage, textStyle);
-        this.textNode.setOrigin(0.5, 0.5);
+
+        const origin = this.getOrigin();
+        this.textNode.setOrigin(origin.x, origin.y);
+
         this.textNode.setDepth(2);
 
         return { textWidth: this.textNode.width, textHeight: this.textNode.height };
@@ -62,22 +69,76 @@ export class PlayerFeedback {
         const { x, y } = this.getPosition();
         const convertedColor = color.startsWith('#') ? color.replace('#', '0x') : color;
         this.backgroundNode = this.hudScene.add.rectangle(x, y, width, height, convertedColor, alpha);
-        this.backgroundNode.setOrigin(0.5, 0.5);
+
+        const origin = this.getOrigin();
+        this.backgroundNode.setOrigin(origin.x, origin.y);
+
         this.backgroundNode.setDepth(1);
     }
 
     // Determines the position of the feedback
     getPosition() {
-        if (this.position === null) {
-            return {
-                x: this.sizes.width / 2,
-                y: this.sizes.height / 2,
-            };
-        } else {
-            return {
-                x: this.position.x,
-                y: this.position.y,
-            };
+        const canvasWidth = this.hudScene.scale.width;
+        const canvasHeight = this.hudScene.scale.height;
+
+        let x = canvasWidth / 2;
+        let y = canvasHeight / 2;
+
+        if (this.position) {
+            x = this.position.x;
+            y = this.position.y;
+        }
+
+        if (this.align === 'top-right') {
+            x = canvasWidth - this.margin.x;
+            y = this.margin.y;
+        } else if (this.align === 'top-left') {
+            x = this.margin.x;
+            y = this.margin.y;
+        } else if (this.align === 'bottom-left') {
+            x = this.margin.x;
+            y = canvasHeight - this.margin.y;
+        } else if (this.align === 'bottom-right') {
+            x = canvasWidth - this.margin.x;
+            y = canvasHeight - this.margin.y;
+        } else if (this.align === 'top-center') {
+            x = canvasWidth / 2;
+            y = this.margin.y;
+        } else if (this.align === 'bottom-center') {
+            x = canvasWidth / 2;
+            y = canvasHeight - this.margin.y;
+        }
+
+        return { x, y };
+    }
+
+    getOrigin() {
+        switch (this.align) {
+            case 'top-right':
+                return { x: 1, y: 0 };
+            case 'top-left':
+                return { x: 0, y: 0 };
+            case 'bottom-left':
+                return { x: 0, y: 1 };
+            case 'bottom-right':
+                return { x: 1, y: 1 };
+            case 'top-center':
+                return { x: 0.5, y: 0 };
+            case 'bottom-center':
+                return { x: 0.5, y: 1 };
+            default:
+                return { x: 0.5, y: 0.5 };
+        }
+    }
+
+    onResize(gameSize, baseSize, displaySize, resolution) {
+        // Update position based on new canvas size
+        const { x, y } = this.getPosition();
+        if (this.textNode) {
+            this.textNode.setPosition(x, y);
+        }
+        if (this.backgroundNode) {
+            this.backgroundNode.setPosition(x, y);
         }
     }
 
