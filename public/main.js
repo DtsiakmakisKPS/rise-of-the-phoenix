@@ -213,6 +213,19 @@ class GameScene extends Phaser.Scene {
         // Determine which chair is available (not taken)
         const availableChairIndex = Phaser.Math.Between(0, chairObjects.length - 1);
 
+        // Npc Animations
+        this.anims.create({
+            key: `bob_sit_left`,
+            frames: this.anims.generateFrameNumbers(`bob_sit`, { start: 0, end: 0 }),
+            frameRate: 10,
+        });
+
+        this.anims.create({
+            key: `bob_sit_right`,
+            frames: this.anims.generateFrameNumbers(`bob_sit`, { start: 6, end: 7 }),
+            frameRate: 10,
+        });
+
         // Iterate through each chair object from the tilemap and create a Zone
         chairObjects.forEach((chair, index) => {
             chair.taken = (index !== availableChairIndex);
@@ -230,7 +243,15 @@ class GameScene extends Phaser.Scene {
 
             // Add npc only on taken chairs
             if (chair.taken) {
-                this.physics.add.sprite(chair.x, chair.y, 'bob_sit').setOrigin(0.6, 0.9);
+                const npc = this.physics.add.sprite(chair.x, chair.y, 'bob_sit').setOrigin(0.6, 0.9);
+                npc.body.setSize(npc.width - 20, npc.height - 20);
+                npc.body.setOffset(20, 20);
+
+                if(chair.type === 'Left') {
+                    npc.setFlipX(true);
+
+                }
+
             }
         });
 
@@ -268,13 +289,14 @@ class GameScene extends Phaser.Scene {
                 repeat: -1,
             });
 
-            // Down (corrected to use `${spriteKey}_idle` or appropriate frames)
+            // Down
             this.anims.create({
                 key: `${spriteKey}_down`,
                 frames: this.anims.generateFrameNumbers(`${spriteKey}`, {start: 18, end: 23}),
                 frameRate: 10,
                 repeat: -1,
             });
+
         });
     }
 
@@ -422,7 +444,7 @@ const config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 0 },
-            debug: false
+            debug: true
         }
     },
     scene: [GameScene, HUD]
