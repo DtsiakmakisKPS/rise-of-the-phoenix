@@ -207,7 +207,6 @@ class GameScene extends Phaser.Scene {
 
         this.socket.on('chairFound', () => {
             console.log('END GAME');
-            //There is still logic needed, to respawn people
         });
 
 
