@@ -69,7 +69,7 @@ body {
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 canvas {
@@ -78,4 +78,20 @@ canvas {
   position: relative;
   left: 0;
   top: 0;
+}
+
+.final-popup {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    right: auto;
+    z-index: 1;
+    background-color: mediumseagreen;
+    padding: 14px;
+    border-radius: 4px;
 }
