@@ -9,6 +9,7 @@ export default class GameLoop {
 
         this.currentPhase = 'PRE_GAME'; // Possible phases: 'PRE_GAME', 'GAME', 'GAME_BREAK'
         this.phaseTimeout = null;
+        this.phaseEndTime = null;
 
         // Start the game loop
         this.startGameLoop();
@@ -28,10 +29,11 @@ export default class GameLoop {
 
     setPhase(phaseName, duration, nextPhaseCallback) {
         this.currentPhase = phaseName;
-        const phaseEndTime = Date.now() + duration;
+        this.phaseEndTime = Date.now() + duration; // Record expected end time
+
         this.io.emit('phaseChange', {
             phase: this.currentPhase,
-            phaseEndTime: phaseEndTime
+            phaseEndTime: this.phaseEndTime
         });
         console.log(`Phase changed to: ${this.currentPhase}`);
 
@@ -48,6 +50,14 @@ export default class GameLoop {
 
     getCurrentPhase() {
         return this.currentPhase;
+    }
+
+    getRemainingTime() {
+        if (this.phaseEndTime) {
+            return Math.max(0, this.phaseEndTime - Date.now());
+        } else {
+            return 0;
+        }
     }
 
     // Clean up when necessary
