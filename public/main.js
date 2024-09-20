@@ -285,8 +285,8 @@ class HUD extends Phaser.Scene {
         const preGameCounter = new PlayerFeedback(
             this,
             'Game starts in: ',
-            sizes,
-            { x: sizes.width / 2, y: (sizes.height / 2) - 500 },);
+            worldSize,
+            { x: worldSize.width / 2, y: (worldSize.height / 2) - 500 },);
         preGameCounter.addCountdown('preGameEnd', 10);
         preGameCounter.setBackgroundColor('#000', 0.3);
         Game.events.on('startLobby', function () {
@@ -296,8 +296,8 @@ class HUD extends Phaser.Scene {
         const roundTimer = new PlayerFeedback(
             this,
             'Round Timer: ',
-            sizes,
-            { x: sizes.width / 2, y: 300 },
+            worldSize,
+            { x: worldSize.width / 2, y: 300 },
         );
         roundTimer.addCountdown('roundTimerEnd', 150);
         roundTimer.setBackgroundColor('#001e3c', 0.8);
@@ -305,7 +305,7 @@ class HUD extends Phaser.Scene {
             roundTimer.render();
         }, this);
 
-        const roundOverFeedback = new PlayerFeedback(this, 'Round Over!', sizes);
+        const roundOverFeedback = new PlayerFeedback(this, 'Round Over!', worldSize);
         roundOverFeedback.setBackgroundColor('#000', 0.3);
         Game.events.on('stopGame', function () {
             roundOverFeedback.render();
