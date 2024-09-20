@@ -332,7 +332,7 @@ class GameScene extends Phaser.Scene {
     }
 
     handleCoffeeBreak(player, chairZone) {
-        if (chairZone.isActiveForBreak) {
+        if (chairZone.isActiveForBreak && !chairZone.taken) {
             const breakPopup = document.querySelector('.break-popup');
             breakPopup.classList.remove('hidden');
             player.body.setVelocity(0);
