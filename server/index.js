@@ -25,10 +25,10 @@ io.on('connection', function (socket) {
         socket.handshake.headers['x-real-ip'] ??
         socket.handshake.address;
 
-    if (BLOCK_IP && ipMap[ipAddress]) {
-        socket.disconnect();
-        return;
-    }
+    // if (BLOCK_IP && ipMap[ipAddress]) {
+    //     socket.disconnect();
+    //     return;
+    // }
     ipMap[ipAddress] = true;
 
     // create a new player and add it to our players object

@@ -8,6 +8,8 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/assets/map/map.tmx" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/map/map.tmx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/assets/map/world.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/map/world.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/main.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/index.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -99,9 +101,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="npm.start" />
+        <item itemvalue="npm.server" />
         <item itemvalue="npm.pretty" />
-        <item itemvalue="npm.server" />
-        <item itemvalue="npm.server" />
+        <item itemvalue="npm.start" />
+        <item itemvalue="npm.pretty" />
       </list>
     </recent_temporary>
   </component>
