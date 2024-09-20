@@ -236,7 +236,7 @@ class GameScene extends Phaser.Scene {
             // Create a Zone for each chair
             const chairZone = this.add.zone(chair.x, chair.y - chair.height, chair.width, chair.height);
             this.physics.world.enable(chairZone, Phaser.Physics.Arcade.STATIC_BODY);
-            chairZone.body.setSize(chair.width, chair.height);
+            chairZone.body.setSize(chair.width + 100, chair.height);
             chairZone.body.setOffset(0, 0);
             chairZone.isChair = true;
             chairZone.taken = chair.taken;
