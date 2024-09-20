@@ -70,6 +70,11 @@ io.on('connection', function (socket) {
         delete ipMap[ipAddress];
     });
 
+    socket.on('chairFound', function(){
+        socket.broadcast.emit('chairFound', players[socket.id]);
+        socket.broadcast.emit('phaseChange', { phase: 'GAME_BREAK'});
+    })
+
     // Handle player movement and animation updates
     socket.on('playerMovement', function (movementData) {
         if (players[socket.id]) {
