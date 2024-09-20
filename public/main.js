@@ -427,8 +427,6 @@ const config = {
     scale: {
         parent: 'game-wrapper',
         mode: Phaser.Scale.RESIZE,
-        width: 1700,
-        height: 650,
     },
     physics: {
         default: 'arcade',
