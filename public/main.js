@@ -1,7 +1,7 @@
 import {musicController} from "./music-controller.js";
 import {PlayerFeedback} from "./player-feedback.js";
 
-const sizes = {
+const worldSize = {
     width: 4160,
     height: 3840
 }
@@ -36,8 +36,8 @@ class GameScene extends Phaser.Scene {
         this.physics.add.collider(this.player, decorationLayer);
         this.entryCollider = this.physics.add.collider(this.player, entryLayer);
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
-        this.cameras.main.setZoom(5); // Adjust the zoom level as desired
-        this.cameras.main.setBounds(0, 0, sizes.width, sizes.height); // Set camera bounds to the map size
+        this.cameras.main.setZoom(2); // Adjust the zoom level as desired
+        this.cameras.main.setBounds(0, 0, worldSize.width, worldSize.height); // Set camera bounds to the map size
     }
 
     addOtherPlayer(self, playerInfo) {
@@ -315,12 +315,14 @@ class HUD extends Phaser.Scene {
 
 const config = {
     type: Phaser.CANVAS,
-    width: sizes.width,
-    height: sizes.height,
-    canvas: gameCanvas,
+    width: 1750,
+    height: 600,
+    canvas: gameCanvas,    
     scale: {
-        mode: Phaser.Scale.CENTER_BOTH,
-        autoCenter: Phaser.Scale.CENTER_BOTH,
+        parent: 'game-wrapper',
+        mode: Phaser.Scale.FIT,
+        width: 1700,
+        height: 600,
     },
     physics: {
         default: 'arcade',

@@ -1,5 +1,19 @@
 body {
   margin: 0;
+  background-image: url(assets/fire.jpg);
+  background-size: cover;
+}
+
+.logo {
+    margin: 20px auto 30px auto;
+    display: block;
+}
+
+.game-wrapper {
+    width: 1700px;
+    height: 600px;      
+    outline: 20px orange ridge; 
+    margin: 20px auto;
 }
 
 .volume-slider {

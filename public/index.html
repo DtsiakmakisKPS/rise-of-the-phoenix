@@ -9,25 +9,37 @@
     <title>Rise of the Phoenix</title>
   </head>
   <body>
-
     <div class="volume-control">
-        <button tabindex="-1" class="volume-button">
-          <img id="volumeOn" src="/assets/volume.svg" alt="volume" class="volume-icon" />
-          <img id="volumeOff" src="/assets/volume-cross.svg" alt="volume" class="volume-icon hidden" />
-        </button>
-        <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value="0.2"
-            class="volume-slider"
-            tabindex="-1"
+      <button class="volume-button">
+        <img
+          id="volumeOn"
+          src="/assets/volume.svg"
+          alt="volume"
+          class="volume-icon"
         />
+        <img
+          id="volumeOff"
+          src="/assets/volume-cross.svg"
+          alt="volume"
+          class="volume-icon hidden"
+        />
+      </button>
+      <input
+        type="range"
+        min="0"
+        max="1"
+        step="0.01"
+        value="0.2"
+        class="volume-slider"
+      />
     </div>
     <script src="//cdnjs.cloudflare.com/ajax/libs/phaser/3.85.1/phaser.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <canvas id="gameCanvas"></canvas>
+    <img src="assets/logo-game.svg" class="logo" />
+    <div id="game-wrapper" class="game-wrapper">
+      <canvas id="gameCanvas"></canvas>
+    </div>
+
     <script type="module" src="/main.js"></script>
     <script type="module" src="/music-controller.js"></script>
     <script type="module" src="/player-feedback.js"></script>
