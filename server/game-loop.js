@@ -29,11 +29,11 @@ export default class GameLoop {
 
     setPhase(phaseName, duration, nextPhaseCallback) {
         this.currentPhase = phaseName;
-        this.phaseEndTime = Date.now() + duration; // Record expected end time
+        this.phaseEndTime = Date.now() + duration;
 
         this.io.emit('phaseChange', {
-            phase: this.currentPhase,
-            phaseEndTime: this.phaseEndTime
+            phase: this.getCurrentPhase(),
+            phaseEndTime: this.getRemainingTime()
         });
         console.log(`Phase changed to: ${this.currentPhase}`);
 
