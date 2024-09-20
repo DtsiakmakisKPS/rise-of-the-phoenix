@@ -29,6 +29,7 @@ class GameScene extends Phaser.Scene {
         this.playerSprite = 'bob';
         this.animationState = 'idle';
         this.musicController = null;
+        this.gameWonFeedback = document.querySelector('.final-popup');
     }
 
     addPlayer(playerInfo, spawnPoint, worldLayer, decorationLayer, entryLayer) {
@@ -63,6 +64,12 @@ class GameScene extends Phaser.Scene {
         this.otherPlayers.add(otherPlayer);
     }
 
+    respawnPlayer() {
+        this.player.setPosition(spawnPoint.x, spawnPoint.y);
+        this.gameWonFeedback.classList.add('hidden');
+        this.physics.resume();
+    }
+
     // Game Lifecycle Hooks
     startLobby(remainingTime) {
         this.events.emit('startLobby', remainingTime);
@@ -76,6 +83,7 @@ class GameScene extends Phaser.Scene {
 
     stopGame(remainingTime) {
         this.events.emit('stopGame', remainingTime);
+        this.respawnPlayer();
         console.log('Game stopped!');
     }
 
@@ -304,7 +312,6 @@ class GameScene extends Phaser.Scene {
     }
 
     handleChairOverlap(player, chairZone) {
-        const finalPopup = document.querySelector('.final-popup')
         if (!chairZone.taken) {
             finalPopup.classList.remove('hidden')
             player.body.setVelocity(0);
