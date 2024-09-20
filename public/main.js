@@ -404,10 +404,6 @@ class HUD extends Phaser.Scene {
             'center'
         );
         preGameCounter.setBackgroundColor('#000', 0.3);
-        Game.events.on('startLobby', function (remainingTime) {
-            preGameCounter.addCountdown('preGameEnd', remainingTime || 10);
-            preGameCounter.render();
-        }, this);
 
         const roundTimer = new PlayerFeedback(
             this,
@@ -415,16 +411,26 @@ class HUD extends Phaser.Scene {
             null,
             'top-right'
         );
-
         roundTimer.setBackgroundColor('#001e3c', 0.8);
+
+        const roundOverFeedback = new PlayerFeedback(this, 'Round Over!', null, 'center');
+        roundOverFeedback.setBackgroundColor('#000', 0.3);
+
+
+        Game.events.on('startLobby', function (remainingTime) {
+            roundOverFeedback.removeFeedback();
+            preGameCounter.addCountdown('preGameEnd', remainingTime || 10);
+            preGameCounter.render();
+        }, this);
+
         Game.events.on('startGame', function (remainingTime) {
+            preGameCounter.removeFeedback();
             roundTimer.addCountdown('roundTimerEnd', remainingTime || 150);
             roundTimer.render();
         }, this);
 
-        const roundOverFeedback = new PlayerFeedback(this, 'Round Over!', null, 'center');
-        roundOverFeedback.setBackgroundColor('#000', 0.3);
         Game.events.on('stopGame', function (remainingTime) {
+            roundTimer.removeFeedback();
             roundOverFeedback.setDuration(remainingTime || 2)
             roundOverFeedback.render();
         }, this);
