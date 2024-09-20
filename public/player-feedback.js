@@ -34,7 +34,7 @@ export class PlayerFeedback {
     // Renders the feedback with optional countdown
     render() {
         const { textWidth, textHeight } = this.renderMessage();
-        // this.renderBackground(textWidth + 100, textHeight + 100);
+        this.renderBackground(textWidth + 100, textHeight + 100);
 
         if (this.type === 'countdown') {
             this.startCountdownTimer();
@@ -68,12 +68,13 @@ export class PlayerFeedback {
     renderBackground(width, height, color = this.backgroundColor.color, alpha = this.backgroundColor.alpha) {
         const { x, y } = this.getPosition();
         const convertedColor = color.startsWith('#') ? color.replace('#', '0x') : color;
-        this.backgroundNode = this.hudScene.add.rectangle(x, y, width, height, convertedColor, alpha);
+        //this.backgroundNode = this.hudScene.add.rectangle(x, y, width, height, convertedColor, alpha);
+        this.backgroundNode = null
 
         const origin = this.getOrigin();
-        this.backgroundNode.setOrigin(origin.x, origin.y);
+        //this.backgroundNode.setOrigin(origin.x, origin.y);
 
-        this.backgroundNode.setDepth(1);
+        //this.backgroundNode.setDepth(1);
     }
 
     // Determines the position of the feedback
@@ -174,10 +175,10 @@ export class PlayerFeedback {
         const formattedTime = this.formatTime(this.countdownLength);
         this.textNode.setText(`${this.message} ${formattedTime}`);
 
-        // Adjust the background size if needed
+        /*// Adjust the background size if needed
         const newWidth = this.textNode.width + 100;
         const newHeight = this.textNode.height + 100;
-        this.backgroundNode.setSize(newWidth, newHeight);
+        this.backgroundNode.setSize(newWidth, newHeight);*/
     }
 
     // Formats the time as MM:SS
