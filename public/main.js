@@ -1,5 +1,5 @@
-import {musicController} from "./music-controller.js";
-import {PlayerFeedback} from "./player-feedback.js";
+import { musicController } from "./music-controller.js";
+import { PlayerFeedback } from "./player-feedback.js";
 
 const worldSize = {
     width: 4160,
@@ -10,11 +10,12 @@ const worldSize = {
 const activeSpriteKeys = ['adam', 'alex', 'amelia', 'bob'];
 
 const speed = 300;
-var keyA;
-var keyS;
-var keyD;
-var keyW;
+let keyA;
+let keyS;
+let keyD;
+let keyW;
 const ZOOM_LEVEL = 0.5;
+
 class GameScene extends Phaser.Scene {
     constructor() {
         super('scene-game');
@@ -23,28 +24,37 @@ class GameScene extends Phaser.Scene {
         this.cursor = null;
         this.playerSpeed = speed + 50;
         this.entryCollider = null;
+        this.playerSprite = 'bob'
+        this.animationState = 'idle'; // Initialize animationState
     }
 
-    addPlayer(self, playerInfo, spawnPoint, worldLayer, decorationLayer, entryLayer) {
-        const avatarKey = this.animationState === 'idle' ? 'dude_idle' : 'dude';        
-        this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, avatarKey).setOrigin(0.5, 0.5);        
+    addPlayer(playerInfo, spawnPoint, worldLayer, decorationLayer, entryLayer) {
+        const avatarKey = `${playerInfo.playerSprite}_idle`;
+        this.player = this.physics.add.sprite(spawnPoint.x, spawnPoint.y, avatarKey).setOrigin(0.5, 0.5);
+        this.player.playerId = playerInfo.playerId;
+        this.player.playerSprite = playerInfo.playerSprite;
+        this.player.animationState = playerInfo.animationState || 'idle';
         this.player.setImmovable(false); // Allow player to move
-        this.player.anims.play(this.animationState, true);
-        // Add overlap detection between player and chairs
-        this.physics.add.overlap(this.player, this.chairs, this.handleChairOverlap, null, this);
-        this.physics.add.collider(this.player, worldLayer);        
+        this.player.anims.play(`${playerInfo.playerSprite}_${this.player.animationState}`, true); // Play initial animation
+        this.physics.add.collider(this.player, worldLayer);
         this.physics.add.collider(this.player, decorationLayer);
         this.entryCollider = this.physics.add.collider(this.player, entryLayer);
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
-        this.cameras.main.setZoom(2); // Adjust the zoom level as desired
-        this.cameras.main.setBounds(0, 0, worldSize.width, worldSize.height); // Set camera bounds to the map size
+        this.cameras.main.setZoom(5); // Adjust the zoom level as desired
+        this.cameras.main.setBounds(0, 0, worldSize.width, worldSize.height);
+
+        // Add overlap detection between player and chairs
+        this.physics.add.overlap(this.player, this.chairs, this.handleChairOverlap, null, this);
     }
 
-    addOtherPlayer(self, playerInfo) {
-        const avatarKey = this.animationState === 'idle' ? 'dude_idle' : 'dude';
-        const otherPlayer = this.physics.add.sprite(playerInfo.x, playerInfo.y,avatarKey).setOrigin(0.5,0.5);
+    addOtherPlayer(playerInfo) {
+        const avatarKey = `${playerInfo.playerSprite}_idle`;
+        const otherPlayer = this.physics.add.sprite(playerInfo.x, playerInfo.y, avatarKey).setOrigin(0.5, 0.5);
         otherPlayer.playerId = playerInfo.playerId;
+        otherPlayer.playerSprite = playerInfo.playerSprite;
+        otherPlayer.animationState = playerInfo.animationState || 'idle';
         otherPlayer.setImmovable(false);
+        otherPlayer.anims.play(`${playerInfo.playerSprite}_${otherPlayer.animationState}`, true);
         this.otherPlayers.add(otherPlayer);
     }
 
@@ -110,13 +120,12 @@ class GameScene extends Phaser.Scene {
 
         // React to UI Events
         const HUD = this.scene.get('HUD');
-        HUD.events.on('preGameEnd', function () {
+        HUD.events.on('preGameEnd', () => {
             this.startGame();
         }, this);
-        HUD.events.on('roundTimerEnd', function () {
+        HUD.events.on('roundTimerEnd', () => {
             this.stopGame();
         }, this);
-
 
         // Load and configure the tilemap
         const map = this.make.tilemap({ key: 'map' });
@@ -137,22 +146,22 @@ class GameScene extends Phaser.Scene {
         worldLayer.setCollisionByProperty({ collides: true });
         decorationLayer.setCollisionByProperty({ collides: true });
         entryLayer.setCollisionByProperty({ collides: true });
-        game.scale.resize(window.innerWidth/ZOOM_LEVEL, window.innerHeight/ZOOM_LEVEL);
+        this.scale.resize(window.innerWidth / ZOOM_LEVEL, window.innerHeight / ZOOM_LEVEL);
 
-        this.resizing(this.cameras);
+        this.resizing();
 
-        setTimeout(function() {         
-            console.log(self.entryCollider);   
-            if (self.entryCollider) {
+        setTimeout(() => {
+            console.log(this.entryCollider);
+            if (this.entryCollider) {
                 console.log("entryLayer", entryLayer);
-                self.physics.world.removeCollider(self.entryCollider);
-                entryLayer.destroy();   
-            }         
+                this.physics.world.removeCollider(this.entryCollider);
+                entryLayer.destroy();
+            }
         }, 5000);
-                
+
         this.cursor = this.input.keyboard.createCursorKeys();
 
-        //add WASD Keys for animations
+        // Add WASD Keys for animations
         keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
         keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
@@ -161,31 +170,31 @@ class GameScene extends Phaser.Scene {
         // Initialize groups
         this.otherPlayers = this.physics.add.group();
 
-        // Register socket event handlers outside of other handlers
-        this.socket.on('currentPlayers', function (players) {
-            console.log(players, self.socket.id);
-            Object.keys(players).forEach(function (id) {
-                if (players[id].playerId === self.socket.id) {
-                    self.addPlayer(players[id], spawnPoint, worldLayer, decorationLayer);
+        // Register socket event handlers using arrow functions to preserve 'this'
+        this.socket.on('currentPlayers', (players) => {
+            console.log(players, this.socket.id);
+            Object.keys(players).forEach((id) => {
+                if (players[id].playerId === this.socket.id) {
+                    this.addPlayer(players[id], spawnPoint, worldLayer, decorationLayer, entryLayer);
                 } else {
-                    self.addOtherPlayer(players[id]);
+                    this.addOtherPlayer(players[id]);
                 }
             });
         });
 
         // Handle new player joining
-        this.socket.on('newPlayer', function (playerInfo) {
-            self.addOtherPlayer(playerInfo);
+        this.socket.on('newPlayer', (playerInfo) => {
+            this.addOtherPlayer(playerInfo);
         });
 
         // Handle player movement
-        this.socket.on('playerMoved', function (playerInfo) {
-            self.otherPlayers.getChildren().forEach(function (otherPlayer) {
+        this.socket.on('playerMoved', (playerInfo) => {
+            this.otherPlayers.getChildren().forEach((otherPlayer) => {
                 if (playerInfo.playerId === otherPlayer.playerId) {
                     otherPlayer.setPosition(playerInfo.x, playerInfo.y);
                     // Update animation state if it has changed
                     if (otherPlayer.animationState !== playerInfo.animationState) {
-                        otherPlayer.anims.play(`${playerInfo.playerSprite}_${playerInfo.animationState}`, true);
+                        otherPlayer.anims.play(`${otherPlayer.playerSprite}_${playerInfo.animationState}`, true);
                         otherPlayer.animationState = playerInfo.animationState;
                     }
                 }
@@ -193,8 +202,8 @@ class GameScene extends Phaser.Scene {
         });
 
         // Handle player removal
-        this.socket.on('playerRemoved', function (playerId) {
-            self.otherPlayers.getChildren().forEach(function (otherPlayer) {
+        this.socket.on('playerRemoved', (playerId) => {
+            this.otherPlayers.getChildren().forEach((otherPlayer) => {
                 if (playerId === otherPlayer.playerId) {
                     otherPlayer.destroy();
                 }
@@ -228,8 +237,6 @@ class GameScene extends Phaser.Scene {
             }
         });
 
-
-
         // Define animations for each sprite
         activeSpriteKeys.forEach((spriteKey) => {
             // Left
@@ -248,12 +255,37 @@ class GameScene extends Phaser.Scene {
                 repeat: -1,
             });
 
-        this.startLobby();
+            // Right
+            this.anims.create({
+                key: `${spriteKey}_right`,
+                frames: this.anims.generateFrameNumbers(spriteKey, { start: 0, end: 5 }),
+                frameRate: 10,
+                repeat: -1,
+            });
+
+            // Up
+            this.anims.create({
+                key: `${spriteKey}_up`,
+                frames: this.anims.generateFrameNumbers(spriteKey, { start: 6, end: 11 }),
+                frameRate: 10,
+                repeat: -1,
+            });
+
+            // Down (corrected to use `${spriteKey}_idle` or appropriate frames)
+            this.anims.create({
+                key: `${spriteKey}_down`,
+                frames: this.anims.generateFrameNumbers(`${spriteKey}`, { start: 18, end: 23 }),
+                frameRate: 10,
+                repeat: -1,
+            });
+        });
+
+        this.startLobby(); // Move outside the forEach loop
     }
 
     handleChairOverlap(player, chairZone) {
-        // Check if the chair is not taken and hasn't already triggered an alert
         if (!chairZone.taken && !chairZone.hasAlerted) {
+            // Replace alert with in-game notification if desired
             alert('You touched an available chair!');
             chairZone.hasAlerted = true; // Set a flag to prevent repeated alerts
 
@@ -267,8 +299,8 @@ class GameScene extends Phaser.Scene {
 
     update() {
         // this.cameras.main.setZoom(5)
-        if(this.player) {
-            const {up, down, left , right} = this.cursor;
+        if (this.player) {
+            const { up, down, left, right } = this.cursor;
             this.player.setVelocity(0);
             let moving = false;
             let newAnimation = this.player.animationState;
@@ -328,19 +360,18 @@ class GameScene extends Phaser.Scene {
             };
         }
     }
-} // Correctly close the GameScene class
+
+    resizing() {
+        window.addEventListener("resize", () => {
+            this.scale.resize(window.innerWidth / ZOOM_LEVEL, window.innerHeight / ZOOM_LEVEL);
+            this.cameras.main.setZoom(3); // Adjust the zoom level as desired
+        }, false);
+    }
+}
 
 // Helper function to capitalize sprite keys
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
-    resizing(cameras) {
-        window.addEventListener("resize", () => {
-            game.scale.resize(window.innerWidth/ZOOM_LEVEL, window.innerHeight/ZOOM_LEVEL);
-            cameras.main.setZoom(3); // Adjust the zoom level as desired
-        },false
-
-        );
-    }
 }
 
 const gameCanvas = document.getElementById('gameCanvas'); // Ensure this element exists in your HTML
@@ -350,19 +381,18 @@ class HUD extends Phaser.Scene {
         super({ key: 'HUD', active: true });
     }
 
-    create ()
-    {
+    create() {
         const Game = this.scene.get('scene-game');
-
 
         const preGameCounter = new PlayerFeedback(
             this,
             'Game starts in: ',
             worldSize,
-            { x: worldSize.width / 2, y: (worldSize.height / 2) - 500 },);
+            { x: worldSize.width / 2, y: (worldSize.height / 2) - 500 },
+        );
         preGameCounter.addCountdown('preGameEnd', 10);
         preGameCounter.setBackgroundColor('#000', 0.3);
-        Game.events.on('startLobby', function () {
+        Game.events.on('startLobby', () => {
             preGameCounter.render();
         }, this);
 
@@ -374,13 +404,13 @@ class HUD extends Phaser.Scene {
         );
         roundTimer.addCountdown('roundTimerEnd', 150);
         roundTimer.setBackgroundColor('#001e3c', 0.8);
-        Game.events.on('startGame', function () {
+        Game.events.on('startGame', () => {
             roundTimer.render();
         }, this);
 
         const roundOverFeedback = new PlayerFeedback(this, 'Round Over!', worldSize);
         roundOverFeedback.setBackgroundColor('#000', 0.3);
-        Game.events.on('stopGame', function () {
+        Game.events.on('stopGame', () => {
             roundOverFeedback.render();
         }, this);
     }
@@ -393,10 +423,9 @@ const config = {
     canvas: gameCanvas,
     scale: {
         mode: Phaser.Scale.NONE,
-        width: window.innerWidth/ZOOM_LEVEL,
-        height: window.innerHeight/ZOOM_LEVEL,
+        width: window.innerWidth / ZOOM_LEVEL,
+        height: window.innerHeight / ZOOM_LEVEL,
         zoom: ZOOM_LEVEL
-
     },
     physics: {
         default: 'arcade',
@@ -404,7 +433,6 @@ const config = {
             gravity: { y: 0 },
             debug: false
         }
-
     },
     scene: [GameScene, HUD]
 }
