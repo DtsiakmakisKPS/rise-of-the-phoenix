@@ -125,7 +125,7 @@ class GameScene extends Phaser.Scene {
         gamesStateListeners(this);
 
         // Load and configure the tilemap
-        const map = this.make.tilemap({ key: 'map' });
+        const map = this.make.tilemap({key: 'map'});
         const spawnPoint = map.findObject('Spawn Point', (obj) => obj.name === 'Spawn Point');
         const chairObjects = map.getObjectLayer('Chairs')?.objects || [];
         musicController(this.sound);
@@ -140,9 +140,9 @@ class GameScene extends Phaser.Scene {
         const entryLayer = map.createLayer("entry", tileset, 0, 0);
         const decorationLayer = map.createLayer("decorations", decorationset, 0, 0);
 
-        worldLayer.setCollisionByProperty({ collides: true });
-        decorationLayer.setCollisionByProperty({ collides: true });
-        entryLayer.setCollisionByProperty({ collides: true });
+        worldLayer.setCollisionByProperty({collides: true});
+        decorationLayer.setCollisionByProperty({collides: true});
+        entryLayer.setCollisionByProperty({collides: true});
         //this.scale.resize(window.innerWidth / ZOOM_LEVEL, window.innerHeight / ZOOM_LEVEL);
 
         //this.resizing();
@@ -239,7 +239,7 @@ class GameScene extends Phaser.Scene {
             // Left
             this.anims.create({
                 key: `${spriteKey}_left`,
-                frames: this.anims.generateFrameNumbers(spriteKey, { start: 12, end: 17 }),
+                frames: this.anims.generateFrameNumbers(spriteKey, {start: 12, end: 17}),
                 frameRate: 10,
                 repeat: -1,
             });
@@ -247,7 +247,7 @@ class GameScene extends Phaser.Scene {
             // Idle
             this.anims.create({
                 key: `${spriteKey}_idle`,
-                frames: this.anims.generateFrameNumbers(`${spriteKey}_idle`, { start: 18, end: 23 }),
+                frames: this.anims.generateFrameNumbers(`${spriteKey}_idle`, {start: 18, end: 23}),
                 frameRate: 10,
                 repeat: -1,
             });
@@ -255,7 +255,7 @@ class GameScene extends Phaser.Scene {
             // Right
             this.anims.create({
                 key: `${spriteKey}_right`,
-                frames: this.anims.generateFrameNumbers(spriteKey, { start: 0, end: 5 }),
+                frames: this.anims.generateFrameNumbers(spriteKey, {start: 0, end: 5}),
                 frameRate: 10,
                 repeat: -1,
             });
@@ -263,7 +263,7 @@ class GameScene extends Phaser.Scene {
             // Up
             this.anims.create({
                 key: `${spriteKey}_up`,
-                frames: this.anims.generateFrameNumbers(spriteKey, { start: 6, end: 11 }),
+                frames: this.anims.generateFrameNumbers(spriteKey, {start: 6, end: 11}),
                 frameRate: 10,
                 repeat: -1,
             });
@@ -271,7 +271,7 @@ class GameScene extends Phaser.Scene {
             // Down (corrected to use `${spriteKey}_idle` or appropriate frames)
             this.anims.create({
                 key: `${spriteKey}_down`,
-                frames: this.anims.generateFrameNumbers(`${spriteKey}`, { start: 18, end: 23 }),
+                frames: this.anims.generateFrameNumbers(`${spriteKey}`, {start: 18, end: 23}),
                 frameRate: 10,
                 repeat: -1,
             });
@@ -279,15 +279,11 @@ class GameScene extends Phaser.Scene {
     }
 
     handleChairOverlap(player, chairZone) {
-        if (!chairZone.taken && !chairZone.hasAlerted) {
-            // Replace alert with in-game notification if desired
-            alert('You touched an available chair!');
-            chairZone.hasAlerted = true; // Set a flag to prevent repeated alerts
-
-            // Optionally, reset the flag after some time to allow future alerts
-            this.time.delayedCall(1000, () => {
-                chairZone.hasAlerted = false;
-            }, [], this);
+        const finalPopup = document.querySelector('.final-popup')
+        if (!chairZone.taken) {
+            finalPopup.classList.remove('hidden')
+            player.body.setVelocity(0);
+            this.physics.pause();
         }
     }
 
