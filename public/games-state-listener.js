@@ -5,12 +5,16 @@ export function gamesStateListeners(game) {
         console.log(`Phase changed to: ${phase}`);
         const remainingTime = Math.max(0, Math.floor((phaseEndTime - Date.now()) / 1000));
 
-        if (phase === 'PRE_GAME') {
-            game.startLobby(remainingTime);
-        } else if (phase === 'GAME') {
-            game.startGame(remainingTime);
-        } else if (phase === 'GAME_BREAK') {
-            game.stopGame(remainingTime);
+        switch(phase) {
+            case 'PRE_GAME':
+                game.startLobby(remainingTime);
+                break;
+            case 'GAME': 
+                game.startGame(remainingTime);
+                break;
+            case 'GAME_BREAK':
+                game.stopGame(remainingTime);
+                break;
         }
     });
 }

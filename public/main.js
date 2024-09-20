@@ -1,4 +1,4 @@
-import {musicController} from "./music-controller.js";
+import {MusicController} from "./music-controller.js";
 import {PlayerFeedback} from "./player-feedback.js";
 import {gamesStateListeners} from "./games-state-listener.js";
 
@@ -25,8 +25,10 @@ class GameScene extends Phaser.Scene {
         this.cursor = null;
         this.playerSpeed = speed + 50;
         this.entryCollider = null;
-        this.playerSprite = 'bob'
-        this.animationState = 'idle'; // Initialize animationState
+        this.alreadyPlayingInOtherTab = false;
+        this.playerSprite = 'bob';
+        this.animationState = 'idle';
+        this.musicController = null;
     }
 
     addPlayer(playerInfo, spawnPoint, worldLayer, decorationLayer, entryLayer) {
@@ -128,7 +130,7 @@ class GameScene extends Phaser.Scene {
         const map = this.make.tilemap({key: 'map'});
         const spawnPoint = map.findObject('Spawn Point', (obj) => obj.name === 'Spawn Point');
         const chairObjects = map.getObjectLayer('Chairs')?.objects || [];
-        musicController(this.sound);
+        this.musicController = new MusicController(this.sound);
 
         const tileset = map.addTilesetImage('Room_Builder_free_32x32', 'walls');
         const decorationset = map.addTilesetImage('Interiors_free_32x32', 'decoration');
@@ -142,10 +144,7 @@ class GameScene extends Phaser.Scene {
 
         worldLayer.setCollisionByProperty({collides: true});
         decorationLayer.setCollisionByProperty({collides: true});
-        entryLayer.setCollisionByProperty({collides: true});
-        //this.scale.resize(window.innerWidth / ZOOM_LEVEL, window.innerHeight / ZOOM_LEVEL);
-
-        //this.resizing();
+        entryLayer.setCollisionByProperty({collides: true});        
 
         setTimeout(() => {
             console.log(this.entryCollider);
@@ -205,6 +204,10 @@ class GameScene extends Phaser.Scene {
                     otherPlayer.destroy();
                 }
             });
+        });
+
+        this.socket.on('alreadyPlaying', (isPlaying) => {
+            this.alreadyPlayingInOtherTab = isPlaying;
         });
 
         // Create a physics group for chair zones
@@ -310,7 +313,6 @@ class GameScene extends Phaser.Scene {
     }
 
     update() {
-        // this.cameras.main.setZoom(5)
         if (this.player) {
             const { up, down, left, right } = this.cursor;
             this.player.setVelocity(0);
@@ -371,15 +373,11 @@ class GameScene extends Phaser.Scene {
                 y: this.player.y,
             };
         }
+        if (this.alreadyPlayingInOtherTab) {
+            console.log('already playing');
+            this.musicController.stopMusic();
+        }
     }
-    /*
-    resizing() {
-        window.addEventListener("resize", () => {
-            this.scale.resize(window.innerWidth / ZOOM_LEVEL, window.innerHeight / ZOOM_LEVEL);
-            this.cameras.main.setZoom(3); // Adjust the zoom level as desired
-        }, false);
-    }
-    */
 }
 
 // Helper function to capitalize sprite keys
