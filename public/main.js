@@ -1,19 +1,19 @@
-import {musicController} from "./music-controller.js";
-import {RoundTimer} from "./round-timer.js";
+import { musicController } from './music-controller.js';
+import { RoundTimer } from './round-timer.js';
 
 const sizes = {
     width: 4160,
-    height: 3840
+    height: 3840,
 };
 
 // Active sprites available for players
 const activeSpriteKeys = ['adam', 'alex', 'amelia', 'bob'];
 
-const speed = 300;
-var keyA;
-var keyS;
-var keyD;
-var keyW;
+const speed = 800;
+let keyA;
+let keyS;
+let keyD;
+let keyW;
 
 class GameScene extends Phaser.Scene {
     constructor() {
@@ -33,11 +33,11 @@ class GameScene extends Phaser.Scene {
         this.events.emit('stopGame');
     }
 
-    preload(){
+    preload() {
         // Load map assets
-        this.load.image('walls', 'assets/Room_Builder_free_32x32.png');
-        this.load.image('decoration', 'assets/Interiors_free_32x32.png');
-        this.load.tilemapTiledJSON('map', 'assets/world.json');
+        this.load.image('walls', 'assets/map/Room_Builder_free_32x32.png');
+        this.load.image('decoration', 'assets/map/Interiors_free_32x32.png');
+        this.load.tilemapTiledJSON('map', 'assets/map/world.json');
 
         // Load sprites for each active sprite key
         activeSpriteKeys.forEach((spriteKey) => {
@@ -48,14 +48,28 @@ class GameScene extends Phaser.Scene {
             });
 
             // Load idle animation
-            this.load.spritesheet(`${spriteKey}_idle`, `assets/sprites/${spriteKey}/${capitalize(spriteKey)}_idle_anim_32x32.png`, {
-                frameWidth: 32,
-                frameHeight: 64,
-            });
+            this.load.spritesheet(
+                `${spriteKey}_idle`,
+                `assets/sprites/${spriteKey}/${capitalize(spriteKey)}_idle_anim_32x32.png`,
+                {
+                    frameWidth: 32,
+                    frameHeight: 64,
+                },
+            );
         });
 
+        // Load npc sprites
+        this.load.spritesheet(
+            `bob_sit`,
+            `assets/sprites/bob/Bob_sit_32x32.png`,
+            {
+                frameWidth: 48,
+                frameHeight: 64,
+            },
+        );
+
         // Load audio
-        this.load.audio('backgroundMusic', 'assets/game-bg-music.mp3');
+        this.load.audio('backgroundMusic', 'assets/audio/game-bg-music.mp3');
     }
 
     create() {
@@ -63,37 +77,44 @@ class GameScene extends Phaser.Scene {
         const self = this;
 
         const HUD = this.scene.get('HUD');
-        HUD.events.on('roundTimerEnd', function () {
-            this.stopGame();
-        }, this);
+        HUD.events.on(
+            'roundTimerEnd',
+            function () {
+                this.stopGame();
+            },
+            this,
+        );
 
         // Load and configure the tilemap
         const map = this.make.tilemap({ key: 'map' });
-        const spawnPoint = map.findObject("Spawn Point", obj => obj.name === "Spawn Point");
-        const chairObjects = map.getObjectLayer("Chairs")?.objects || [];
+        const spawnPoint = map.findObject('Spawn Point', (obj) => obj.name === 'Spawn Point');
+        const chairObjects = map.getObjectLayer('Chairs')?.objects || [];
         musicController(this.sound);
 
         const tileset = map.addTilesetImage('Room_Builder_free_32x32', 'walls');
         const decorationset = map.addTilesetImage('Interiors_free_32x32', 'decoration');
 
-        const belowLayer = map.createLayer("floor", tileset, 0, 0);
-        const worldLayer = map.createLayer("walls", [tileset, decorationset], 0, 0);
-        const entryLayer = map.createLayer("entry", tileset, 0, 0);
-        const decorationLayer = map.createLayer("decorations", decorationset, 0, 0);
+        const belowLayer = map.createLayer('floor', tileset, 0, 0);
+        const worldLayer = map.createLayer('walls', [tileset, decorationset], 0, 0);
+        const entryLayer = map.createLayer('entry', tileset, 0, 0);
+        const decorationLayer = map.createLayer('decorations', decorationset, 0, 0);
 
         worldLayer.setCollisionByProperty({ collides: true });
         decorationLayer.setCollisionByProperty({ collides: true });
         entryLayer.setCollisionByProperty({ collides: true });
 
-        setTimeout(function() {
-            console.log(self.entryCollider);
-            if (self.entryCollider) {
-                console.log("entryLayer", entryLayer);
-                self.physics.world.removeCollider(self.entryCollider);
-                entryLayer.destroy();
-            }
-        }, 5000);
+        // Assign a collider if needed
+        // Example:
+        // this.entryCollider = this.physics.add.collider(this.player, entryLayer);
 
+        // setTimeout(function () {
+        //     console.log(self.entryCollider);
+        //     if (self.entryCollider) {
+        //         console.log('entryLayer', entryLayer);
+        //         self.physics.world.removeCollider(self.entryCollider);
+        //         entryLayer.destroy();
+        //     }
+        // }, 5000);
 
         // Setup input controls
         this.cursor = this.input.keyboard.createCursorKeys();
@@ -105,13 +126,11 @@ class GameScene extends Phaser.Scene {
         // Initialize groups
         this.otherPlayers = this.physics.add.group();
 
-        this.socket.on('currentPlayers', function (players) {
-        // Handle current players
+        // Register socket event handlers outside of other handlers
         this.socket.on('currentPlayers', function (players) {
             console.log(players, self.socket.id);
             Object.keys(players).forEach(function (id) {
                 if (players[id].playerId === self.socket.id) {
-                    self.addPlayer(self, players[id], spawnPoint, worldLayer, decorationLayer, entryLayer);
                     self.addPlayer(players[id], spawnPoint, worldLayer, decorationLayer);
                 } else {
                     self.addOtherPlayer(players[id]);
@@ -124,15 +143,11 @@ class GameScene extends Phaser.Scene {
             self.addOtherPlayer(playerInfo);
         });
 
-        this.socket.on('playerMoved', function (playerInfo) {             
-            self.otherPlayers.getChildren().forEach(function (otherPlayer) {
-                if (playerInfo.playerId === otherPlayer.playerId) {                
         // Handle player movement
         this.socket.on('playerMoved', function (playerInfo) {
             self.otherPlayers.getChildren().forEach(function (otherPlayer) {
                 if (playerInfo.playerId === otherPlayer.playerId) {
                     otherPlayer.setPosition(playerInfo.x, playerInfo.y);
-                    // TODO: play animation
                     // Update animation state if it has changed
                     if (otherPlayer.animationState !== playerInfo.animationState) {
                         otherPlayer.anims.play(`${playerInfo.playerSprite}_${playerInfo.animationState}`, true);
@@ -154,18 +169,30 @@ class GameScene extends Phaser.Scene {
         // Create a physics group for chair zones
         this.chairs = this.physics.add.staticGroup();
 
+        // Determine which chair is available (not taken)
+        const availableChairIndex = Phaser.Math.Between(0, chairObjects.length - 1);
+
         // Iterate through each chair object from the tilemap and create a Zone
-        chairObjects.forEach((chair) => {
+        chairObjects.forEach((chair, index) => {
+            chair.taken = (index !== availableChairIndex);
+
             // Create a Zone for each chair
             const chairZone = this.add.zone(chair.x, chair.y - chair.height, chair.width, chair.height);
             this.physics.world.enable(chairZone, Phaser.Physics.Arcade.STATIC_BODY);
             chairZone.body.setSize(chair.width, chair.height);
             chairZone.body.setOffset(0, 0);
             chairZone.isChair = true;
+            chairZone.taken = chair.taken;
 
             // Add the zone to the chairs group
             this.chairs.add(chairZone);
+
+            // Add npc only on taken chairs
+            if (chair.taken) {
+                this.physics.add.sprite(chair.x, chair.y, 'bob_sit').setOrigin(0.6, 0.9);
+            }
         });
+
 
 
         // Define animations for each sprite
@@ -202,7 +229,7 @@ class GameScene extends Phaser.Scene {
                 repeat: -1,
             });
 
-            // Down
+            // Down (corrected to use `${spriteKey}_idle` or appropriate frames)
             this.anims.create({
                 key: `${spriteKey}_down`,
                 frames: this.anims.generateFrameNumbers(`${spriteKey}`, { start: 18, end: 23 }),
@@ -225,6 +252,9 @@ class GameScene extends Phaser.Scene {
         this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
         this.cameras.main.setZoom(5); // Adjust the zoom level as desired
         this.cameras.main.setBounds(0, 0, sizes.width, sizes.height); // Set camera bounds to the map size
+
+        // Add overlap detection between player and chairs
+        this.physics.add.overlap(this.player, this.chairs, this.handleChairOverlap, null, this);
     }
 
     addOtherPlayer(playerInfo) {
@@ -239,14 +269,20 @@ class GameScene extends Phaser.Scene {
     }
 
     handleChairOverlap(player, chairZone) {
-        if (!chairZone.hasAlerted) {
-            alert("You touched a chair!");
+        // Check if the chair is not taken and hasn't already triggered an alert
+        if (!chairZone.taken && !chairZone.hasAlerted) {
+            alert('You touched an available chair!');
             chairZone.hasAlerted = true; // Set a flag to prevent repeated alerts
 
             // Optionally, reset the flag after some time to allow future alerts
-            this.time.delayedCall(1000, () => {
-                chairZone.hasAlerted = false;
-            }, [], this);
+            this.time.delayedCall(
+                1000, // Delay in milliseconds
+                () => {
+                    chairZone.hasAlerted = false;
+                },
+                [],
+                this,
+            );
         }
     }
 
@@ -262,8 +298,7 @@ class GameScene extends Phaser.Scene {
                 this.player.setVelocityX(-this.playerSpeed);
                 newAnimation = 'left';
                 moving = true;
-            }
-            else if (right.isDown || keyD.isDown) {
+            } else if (right.isDown || keyD.isDown) {
                 this.player.setVelocityX(this.playerSpeed);
                 newAnimation = 'right';
                 moving = true;
@@ -290,14 +325,22 @@ class GameScene extends Phaser.Scene {
                 this.player.animationState = newAnimation;
 
                 // Emit the new animation state along with position
-                this.socket.emit('playerMovement', { x: this.player.x, y: this.player.y, animationState: this.player.animationState });
+                this.socket.emit('playerMovement', {
+                    x: this.player.x,
+                    y: this.player.y,
+                    animationState: this.player.animationState,
+                });
             }
 
             // Emit movement if position has changed
             const x = this.player.x;
             const y = this.player.y;
             if (this.player.oldPosition && (x !== this.player.oldPosition.x || y !== this.player.oldPosition.y)) {
-                this.socket.emit('playerMovement', { x: this.player.x, y: this.player.y, animationState: this.player.animationState });
+                this.socket.emit('playerMovement', {
+                    x: this.player.x,
+                    y: this.player.y,
+                    animationState: this.player.animationState,
+                });
             }
             this.player.oldPosition = {
                 x: this.player.x,
@@ -305,7 +348,7 @@ class GameScene extends Phaser.Scene {
             };
         }
     }
-}
+} // Correctly close the GameScene class
 
 // Helper function to capitalize sprite keys
 function capitalize(str) {
@@ -315,21 +358,30 @@ function capitalize(str) {
 const gameCanvas = document.getElementById('gameCanvas'); // Ensure this element exists in your HTML
 
 class HUD extends Phaser.Scene {
-
-    constructor ()
-    {
+    constructor() {
         super({ key: 'HUD', active: true });
     }
 
-    create ()
-    {
+    create() {
         const roundTimer = new RoundTimer(this);
         roundTimer.initiateRoundTimer();
 
         const Game = this.scene.get('scene-game');
-        Game.events.on('startGame', function () {
-            roundTimer.startRoundTimer();
-        }, this);
+        Game.events.on(
+            'startGame',
+            function () {
+                roundTimer.startRoundTimer();
+            },
+            this,
+        );
+
+        Game.events.on(
+            'stopGame',
+            function () {
+                roundTimer.stopRoundTimer(); // Assuming such a method exists
+            },
+            this,
+        );
     }
 }
 
@@ -346,10 +398,10 @@ const config = {
         default: 'arcade',
         arcade: {
             gravity: { y: 0 },
-            debug: false
-        }
+            debug: false,
+        },
     },
-    scene: [GameScene, HUD]
-}
+    scene: [GameScene, HUD],
+};
 
 const game = new Phaser.Game(config);

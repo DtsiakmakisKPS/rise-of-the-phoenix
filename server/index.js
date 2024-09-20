@@ -1,4 +1,3 @@
-
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
@@ -22,9 +21,9 @@ io.on('connection', function (socket) {
     console.log('a user connected');
 
     const ipAddress =
-    socket.handshake.headers["x-forwarded-for"] ??
-    socket.handshake.headers["x-real-ip"] ??
-    socket.handshake.address;
+        socket.handshake.headers['x-forwarded-for'] ??
+        socket.handshake.headers['x-real-ip'] ??
+        socket.handshake.address;
 
     if (BLOCK_IP && ipMap[ipAddress]) {
         socket.disconnect();
@@ -45,7 +44,7 @@ io.on('connection', function (socket) {
         y: 0,
         playerId: socket.id,
         playerSprite: assignedSprite,
-        animationState: 'idle' // Default animation state
+        animationState: 'idle', // Default animation state
     };
 
     // Send the current players to the new player
@@ -58,14 +57,12 @@ io.on('connection', function (socket) {
     socket.on('disconnect', function () {
         console.log(`User disconnected: ${socket.id}`);
 
-
         // remove this player from our players object
         delete players[socket.id];
 
         // Notify all players to remove this player
         socket.broadcast.emit('playerRemoved', socket.id);
         delete ipMap[ipAddress];
-
     });
 
     // Handle player movement and animation updates

@@ -4,9 +4,28 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="42f45b41-7cbe-409e-a12c-04bc1b530a71" name="Changes" comment="chairs with npc's">
+    <list default="true" id="42f45b41-7cbe-409e-a12c-04bc1b530a71" name="Changes" comment="merge with master">
+      <change afterPath="$PROJECT_DIR$/.prettierignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.prettierrc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/assets/sprites/bob/Bob_sit_32x32.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/Bob_run_16x16.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/Interiors_free_32x32.png" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/map/Interiors_free_32x32.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/Room_Builder_free_32x32.png" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/map/Room_Builder_free_32x32.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/default.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/dude.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/game-bg-music.mp3" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/audio/game-bg-music.mp3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/map.tmx" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/map/map.tmx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/volume-cross.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/audio/volume-cross.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/volume.svg" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/audio/volume.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/assets/world.json" beforeDir="false" afterPath="$PROJECT_DIR$/public/assets/map/world.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/public/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/public/main.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/main.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/music-controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/music-controller.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/round-timer.js" beforeDir="false" afterPath="$PROJECT_DIR$/public/round-timer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/public/style.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/server/index.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -33,37 +52,49 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/dimitrios.tsiakmakis/Work/Hackathon 2024/phaser-map/public/assets/sprites/amelia&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;/opt/idea-IU-223.8617.56/plugins/javascript-impl/jsLanguageServicesImpl/external&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "/home/dimitrios.tsiakmakis/Work/Hackathon 2024/phaser-map/public/assets/sprites/bob",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "prettierjs.PrettierConfiguration.Package": "/home/dimitrios.tsiakmakis/Work/Hackathon 2024/phaser-map/node_modules/prettier",
+    "ts.external.directory.path": "/opt/idea-IU-223.8617.56/plugins/javascript-impl/jsLanguageServicesImpl/external",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/public/assets/sprites/bob" />
       <recent name="$PROJECT_DIR$/public/assets/sprites/amelia" />
       <recent name="$PROJECT_DIR$/public/assets/sprites/adam" />
       <recent name="$PROJECT_DIR$/public/assets/sprites/alex" />
       <recent name="$PROJECT_DIR$/public/assets" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/public/assets/audio" />
+      <recent name="$PROJECT_DIR$/public/assets/map" />
       <recent name="$PROJECT_DIR$/public/assets/sprites/alex" />
       <recent name="$PROJECT_DIR$/public/assets/sprites/adam" />
       <recent name="$PROJECT_DIR$/public/assets/sprites/Bob" />
-      <recent name="$PROJECT_DIR$/public/assets/sprites" />
-      <recent name="$PROJECT_DIR$/public/assets" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="npm.start">
+    <configuration name="pretty" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="pretty" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
     <configuration name="server" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -74,8 +105,21 @@
       <envs />
       <method v="2" />
     </configuration>
+    <configuration name="start" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="npm.start" />
+        <item itemvalue="npm.pretty" />
+        <item itemvalue="npm.server" />
         <item itemvalue="npm.server" />
       </list>
     </recent_temporary>

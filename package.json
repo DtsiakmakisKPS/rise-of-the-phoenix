@@ -1,20 +1,22 @@
 {
-  "name": "phaser-map",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "nodemon server/index.js",
-    "start": "node server/index.js"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.5",
-    "vite": "^5.4.1"
-  },
-  "dependencies": {
-    "express": "^4.21.0",
-    "http": "^0.0.1-security",
-    "phaser": "^3.85.2",
-    "socket.io": "^4.7.5"
-  }
+    "name": "phaser-map",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "nodemon server/index.js",
+        "pretty": "npx prettier . --write",
+        "start": "node server/index.js"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.5",
+        "prettier": "3.3.3",
+        "vite": "^5.4.1"
+    },
+    "dependencies": {
+        "express": "^4.21.0",
+        "http": "^0.0.1-security",
+        "phaser": "^3.85.2",
+        "socket.io": "^4.7.5"
+    }
 }
