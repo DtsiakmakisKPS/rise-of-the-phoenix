@@ -32,6 +32,7 @@ class GameScene extends Phaser.Scene {
         this.musicController = null;
         this.entryLayer = null;
         this.gameWonFeedback = document.querySelector('.final-popup');
+        this.cheatKey = null;
     }
 
     addPlayer(playerInfo, spawnPoint, worldLayer, decorationLayer) {
@@ -69,13 +70,13 @@ class GameScene extends Phaser.Scene {
 
     respawnPlayer() {
         this.player.setPosition(spawnPoint.x, spawnPoint.y);
-        this.gameWonFeedback.classList.add('hidden');
         this.physics.resume();
     }
 
     // Game Lifecycle Hooks
     startLobby(remainingTime) {
         this.events.emit('startLobby', remainingTime);
+        this.gameWonFeedback.classList.add('hidden');
         console.log('Pre Game Phase!');
     }
 
@@ -140,6 +141,7 @@ class GameScene extends Phaser.Scene {
     create() {
         this.socket = io();
         const self = this;
+        this.cheatKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J);
 
         gamesStateListeners(this);
 
@@ -204,11 +206,6 @@ class GameScene extends Phaser.Scene {
                 }
             });
         });
-
-        this.socket.on('chairFound', () => {
-            console.log('END GAME');
-        });
-
 
         // Handle player removal
         this.socket.on('playerRemoved', (playerId) => {
@@ -326,8 +323,7 @@ class GameScene extends Phaser.Scene {
             this.physics.pause();
             //Event Emitter chair found
             this.socket.emit('chairFound', this.socket.id);
-
-
+            console.log('Chair found!');
         }
     }
 
@@ -346,6 +342,10 @@ class GameScene extends Phaser.Scene {
 
     update() {
         if (this.player) {
+            if(Phaser.Input.Keyboard.JustDown(this.cheatKey)) {
+                this.handleChairOverlap(this.player, {taken: false});
+            }
+
             const { up, down, left, right } = this.cursor;
             this.player.setVelocity(0);
             let moving = false;
@@ -405,8 +405,8 @@ class GameScene extends Phaser.Scene {
                 y: this.player.y,
             };
         }     
-        
-        if (this.alreadyPlayingInOtherTab) {            
+
+        if (this.alreadyPlayingInOtherTab) {
             this.musicController.stopMusic();
             this.add.rectangle(0, 0, worldSize.width, worldSize.height, 0x000000);
             this.add.text(100, 100, "You entered the game with your current IP address already!", { font: '25px Arial', fill: '#fff' });

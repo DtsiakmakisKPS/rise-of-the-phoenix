@@ -33,6 +33,7 @@ io.on('connection', function (socket) {
         socket.disconnect();
         return;
     }
+
     ipMap[ipAddress] = true;
 
     // create a new player and add it to our players object
@@ -75,8 +76,8 @@ io.on('connection', function (socket) {
     });
 
     socket.on('chairFound', function(){
-        socket.broadcast.emit('chairFound', players[socket.id]);
-        socket.broadcast.emit('phaseChange', { phase: 'GAME_BREAK'});
+        gameLoop.stop();
+        gameLoop.startGameBreak();
     })
 
     // Handle player movement and animation updates
