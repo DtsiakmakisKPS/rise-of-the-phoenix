@@ -68,12 +68,6 @@ class GameScene extends Phaser.Scene {
         this.otherPlayers.add(otherPlayer);
     }
 
-    enableLobbyColliders() {
-        this.entryLayer.setCollisionByProperty({collides: true});
-        this.entryLayer.setVisible(true);
-        this.entryCollider = this.physics.add.collider(this.player, this.entryLayer);
-    }
-
     respawnPlayer() {
         this.player.setPosition(spawnPoint.x, spawnPoint.y);
         this.physics.resume();
@@ -98,7 +92,9 @@ class GameScene extends Phaser.Scene {
     stopGame(remainingTime) {
         this.events.emit('stopGame', remainingTime);
         this.respawnPlayer();
-        this.enableLobbyColliders();
+        this.entryLayer.setCollisionByProperty({collides: true});
+        this.entryLayer.setVisible(true);
+        this.entryCollider = this.physics.add.collider(this.player, this.entryLayer);
         console.log('Game stopped!');
     }
 
