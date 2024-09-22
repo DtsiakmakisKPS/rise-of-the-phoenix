@@ -68,6 +68,12 @@ class GameScene extends Phaser.Scene {
         this.otherPlayers.add(otherPlayer);
     }
 
+    enableLobbyColliders() {
+        this.entryLayer.setCollisionByProperty({collides: true});
+        this.entryLayer.setVisible(true);
+        this.entryCollider = this.physics.add.collider(this.player, this.entryLayer);
+    }
+
     respawnPlayer() {
         this.player.setPosition(spawnPoint.x, spawnPoint.y);
         this.physics.resume();
@@ -91,9 +97,8 @@ class GameScene extends Phaser.Scene {
 
     stopGame(remainingTime) {
         this.events.emit('stopGame', remainingTime);
-        this.physics.world.addCollider(this.player, this.entryCollider);
-        this.entryLayer.setVisible(true);
         this.respawnPlayer();
+        this.enableLobbyColliders();
         console.log('Game stopped!');
     }
 
@@ -144,17 +149,18 @@ class GameScene extends Phaser.Scene {
         this.cheatKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J);
 
         gamesStateListeners(this);
+        this.musicController = new MusicController(this.sound);
 
         // Load and configure the tilemap
         const map = this.make.tilemap({key: 'map'});
         const spawnPoint = map.findObject('Spawn Point', (obj) => obj.name === 'Spawn Point');
         const chairObjects = map.getObjectLayer('Chairs')?.objects || [];
-        this.musicController = new MusicController(this.sound);
+
 
         const tileset = map.addTilesetImage('Room_Builder_free_32x32', 'walls');
         const decorationset = map.addTilesetImage('Interiors_free_32x32', 'decoration');
-        // const tilesetExtended = map.addTilesetImage('Room_Builder_32x32', 'walls_extended');
-        // const decorationsetExtended = map.addTilesetImage('Interiors_32x32', 'decoration_extended');
+        // const tilesetExtended = this.map.addTilesetImage('Room_Builder_32x32', 'walls_extended');
+        // const decorationsetExtended = this.map.addTilesetImage('Interiors_32x32', 'decoration_extended');
 
         const belowLayer = map.createLayer("floor", tileset, 0, 0);
         const worldLayer = map.createLayer("walls", [tileset, decorationset], 0, 0);
