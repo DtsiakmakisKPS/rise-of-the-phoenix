@@ -61,7 +61,8 @@ io.on('connection', function (socket) {
 
     socket.emit('phaseChange', {
         phase: gameLoop.getCurrentPhase(),
-        phaseEndTime: gameLoop.getRemainingTime()
+        phaseEndTime: gameLoop.getRemainingTime(),
+        roundCount: gameLoop.roundCounter
     });
     // Handle player disconnection
     socket.on('disconnect', function () {

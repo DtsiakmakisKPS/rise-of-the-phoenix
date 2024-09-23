@@ -10,6 +10,7 @@ export default class GameLoop {
         this.currentPhase = 'PRE_GAME'; // Possible phases: 'PRE_GAME', 'GAME', 'GAME_BREAK'
         this.phaseTimeout = null;
         this.phaseEndTime = null;
+        this.roundCounter = 1;
 
         // Start the game loop
         this.startGameLoop();
@@ -25,6 +26,7 @@ export default class GameLoop {
 
     startGameBreak() {
         this.setPhase('GAME_BREAK', this.GAME_BREAK_DURATION, this.startGameLoop.bind(this));
+        this.roundCounter++;
     }
 
     setPhase(phaseName, duration, nextPhaseCallback) {
@@ -33,7 +35,8 @@ export default class GameLoop {
 
         this.io.emit('phaseChange', {
             phase: this.getCurrentPhase(),
-            phaseEndTime: this.getRemainingTime()
+            phaseEndTime: this.getRemainingTime(),
+            roundCount: this.roundCounter
         });
         console.log(`Phase changed to: ${this.currentPhase}`);
 

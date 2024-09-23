@@ -33,6 +33,7 @@ class GameScene extends Phaser.Scene {
         this.entryLayer = null;
         this.gameWonFeedback = document.querySelector('.final-popup');
         this.cheatKey = null;
+        this.lastKnownRound = 0;
     }
 
     addPlayer(playerInfo, spawnPoint, worldLayer, decorationLayer) {
@@ -74,23 +75,28 @@ class GameScene extends Phaser.Scene {
     }
 
     // Game Lifecycle Hooks
-    startLobby(remainingTime) {
-        this.events.emit('startLobby', remainingTime);
+    startLobby(remainingTime, roundCount) {
+        this.events.emit('startLobby', remainingTime, roundCount);
         this.gameWonFeedback.classList.add('hidden');
+        this.lastKnownRound = roundCount;
+        console.log('LocalRound', this.lastKnownRound, 'Server Round', roundCount);
         console.log('Pre Game Phase!');
     }
 
-    startGame(remainingTime) {
-        this.events.emit('startGame', remainingTime);
-        if (this.entryCollider) {
+    startGame(remainingTime, roundCount) {
+        this.events.emit('startGame', remainingTime, roundCount);
+        console.log('LocalRound', this.lastKnownRound, 'Server Round', roundCount);
+        if (this.lastKnownRound === roundCount) {
+            console.log('Barrier Removed!');
             this.physics.world.removeCollider(this.entryCollider);
+            this.entryLayer.setCollisionByProperty({collides: false});
             this.entryLayer.setVisible(false);
         }
         console.log('Game started!');
     }
 
-    stopGame(remainingTime) {
-        this.events.emit('stopGame', remainingTime);
+    stopGame(remainingTime, roundCount) {
+        this.events.emit('stopGame', remainingTime, roundCount);
         this.respawnPlayer();
         this.entryLayer.setCollisionByProperty({collides: true});
         this.entryLayer.setVisible(true);
@@ -431,9 +437,10 @@ class HUD extends Phaser.Scene {
     create() {
         const Game = this.scene.get('scene-game');
 
+        const gameGoal = new PlayerFeedback(this, 'Find the last free seat to win!', { x: 0, y: -40}, 'center');
         const preGameCounter = new PlayerFeedback(
             this,
-            'Game starts in: ',
+            'Round 1 starts in: ',
             null,
             'center'
         );
@@ -451,29 +458,33 @@ class HUD extends Phaser.Scene {
         roundOverFeedback.setBackgroundColor('#000', 0.3);
 
 
-        Game.events.on('startLobby', function (remainingTime) {
+        Game.events.on('startLobby', function (remainingTime, roundCount) {
             console.log('startLobby', remainingTime);
             let timer = remainingTime;
             if(remainingTime === 'NaN' || !remainingTime) {
                 timer = 10;
             }
             roundOverFeedback.removeFeedback();
+            gameGoal.setDuration(timer);
+            gameGoal.render();
             preGameCounter.addCountdown('preGameEnd', timer);
+            preGameCounter.setMessage(`Round ${roundCount} starts in: `);
             preGameCounter.render();
         }, this);
 
-        Game.events.on('startGame', function (remainingTime) {
+        Game.events.on('startGame', function (remainingTime, roundCount) {
             console.log('startGame', remainingTime);
             let timer = remainingTime;
             if(remainingTime === 'NaN' || !remainingTime) {
                 timer = 60;
             }
             preGameCounter.removeFeedback();
+            gameGoal.removeFeedback();
             roundTimer.addCountdown('roundTimerEnd', timer);
             roundTimer.render();
         }, this);
 
-        Game.events.on('stopGame', function (remainingTime) {
+        Game.events.on('stopGame', function (remainingTime, roundCount) {
             console.log('stopGame', remainingTime);
             let timer = remainingTime;
             if(remainingTime === 'NaN' || !remainingTime) {

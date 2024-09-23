@@ -33,6 +33,7 @@ export class PlayerFeedback {
 
     // Renders the feedback with optional countdown
     render() {
+        this.removeFeedback();
         const { textWidth, textHeight } = this.renderMessage();
         this.renderBackground(textWidth + 100, textHeight + 100);
 
@@ -86,8 +87,8 @@ export class PlayerFeedback {
         let y = canvasHeight / 2;
 
         if (this.position) {
-            x = this.position.x;
-            y = this.position.y;
+            x = x + this.position.x;
+            y = y + this.position.y;
         }
 
         if (this.align === 'top-right') {
@@ -173,7 +174,11 @@ export class PlayerFeedback {
     // Updates the message with the remaining time
     updateMessageWithTime() {
         const formattedTime = this.formatTime(this.countdownLength);
-        this.textNode.setText(`${this.message} ${formattedTime}`);
+        try {
+            this.textNode.setText(`${this.message} ${formattedTime}`);
+        }   catch (e) {
+            console.log(e);
+        }
 
         /*// Adjust the background size if needed
         const newWidth = this.textNode.width + 100;
@@ -240,5 +245,9 @@ export class PlayerFeedback {
         this.eventName = eventName;
         this.countdownLength = countdownLength;
         this.type = 'countdown';
+    }
+
+    setPermanent(permanent = true) {
+        this.type = permanent ? 'permanent' : 'default';
     }
 }
