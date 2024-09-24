@@ -86,12 +86,13 @@ class GameScene extends Phaser.Scene {
     startGame(remainingTime, roundCount) {
         this.events.emit('startGame', remainingTime, roundCount);
         console.log('LocalRound', this.lastKnownRound, 'Server Round', roundCount);
-        if (this.lastKnownRound === roundCount) {
-            console.log('Barrier Removed!');
-            this.physics.world.removeCollider(this.entryCollider);
-            this.entryLayer.setCollisionByProperty({collides: false});
-            this.entryLayer.setVisible(false);
-        }
+        console.log('Barrier Removed!');
+        this.physics.world.removeCollider(this.entryCollider);
+        this.entryLayer.setCollisionByProperty({collides: false});
+        this.entryLayer.setVisible(false);
+        /*if (this.lastKnownRound === roundCount) {
+
+        }*/
         console.log('Game started!');
     }
 
