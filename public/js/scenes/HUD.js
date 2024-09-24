@@ -1,4 +1,4 @@
-import { PlayerFeedback } from "../player-feedback.js";
+import { PlayerFeedback } from "../components/player-feedback.js";
 
 export class HUD extends Phaser.Scene {
     constructor() {

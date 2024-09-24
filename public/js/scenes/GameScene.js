@@ -1,6 +1,6 @@
 import { MusicController } from "../controllers/music-controller.js";
-import { PlayerFeedback } from "../player-feedback.js";
-import { gamesStateListeners } from "../games-state-listener.js";
+import { PlayerFeedback } from "../components/player-feedback.js";
+import { gamesStateListeners } from "../listeners/games-state-listener.js";
 import { capitalize } from "../utils/helpers.js";
 
 const worldSize = {
